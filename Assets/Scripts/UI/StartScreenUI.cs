@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,20 +19,17 @@ public class StartScreenUI : MonoBehaviour
 
     void OnPlayClicked()
     {
-        // Tu póŸniej: otwieranie menu PvP/PvE
-        Debug.Log("Play clicked");
+        
     }
 
     void OnStatisticsClicked()
     {
-        Debug.Log("Statistics clicked");
-        // SceneManager.LoadScene("Statistics");
+        
     }
 
     void OnSettingsClicked()
     {
-        Debug.Log("Settings clicked");
-        // SceneManager.LoadScene("Settings");
+        
     }
 
     void OnExitClicked()
