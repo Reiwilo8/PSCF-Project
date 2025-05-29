@@ -422,6 +422,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1746563897657075251, guid: 729820d0a8a380943a87817b52e05d47, type: 3}
+      propertyPath: m_Name
+      value: PvEButton
+      objectReference: {fileID: 0}
     - target: {fileID: 2869962132339116232, guid: 729820d0a8a380943a87817b52e05d47, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -482,6 +486,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6527776665938211727, guid: 729820d0a8a380943a87817b52e05d47, type: 3}
+      propertyPath: m_text
+      value: PvE
+      objectReference: {fileID: 0}
     - target: {fileID: 6720139649186181468, guid: 729820d0a8a380943a87817b52e05d47, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -510,6 +518,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Canvas
       objectReference: {fileID: 0}
+    - target: {fileID: 7073336599536745900, guid: 729820d0a8a380943a87817b52e05d47, type: 3}
+      propertyPath: m_text
+      value: Game Mode
+      objectReference: {fileID: 0}
     - target: {fileID: 7173889152904967265, guid: 729820d0a8a380943a87817b52e05d47, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -534,8 +546,18 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7994140002216093009, guid: 729820d0a8a380943a87817b52e05d47, type: 3}
+      propertyPath: m_text
+      value: PvP
+      objectReference: {fileID: 0}
+    - target: {fileID: 8869158241638281812, guid: 729820d0a8a380943a87817b52e05d47, type: 3}
+      propertyPath: m_Name
+      value: PvPButton
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 2294203159831565277, guid: 729820d0a8a380943a87817b52e05d47, type: 3}
+    - {fileID: 466129365524903318, guid: 729820d0a8a380943a87817b52e05d47, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 729820d0a8a380943a87817b52e05d47, type: 3}
