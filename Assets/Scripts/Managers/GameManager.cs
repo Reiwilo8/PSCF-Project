@@ -11,7 +11,9 @@ public class GameManager : MonoBehaviour
     public GameMode SelectedGameMode { get; set; }
     public Difficulty SelectedDifficulty { get; set; }
 
-    public bool IsPlayerOneTurn { get; private set; } = true;
+    public bool IsPlayerOneStarting { get; set; } = true;
+    public bool IsPlayerOneTurn { get; private set; }
+    private bool swapNextStart = false;
 
     public Tile[,] board = new Tile[5, 5];
 
@@ -22,28 +24,33 @@ public class GameManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
+        else Destroy(gameObject);
+    }
+
+    public void ResetTurnOrder()
+    {
+        if (swapNextStart)
+        {
+            IsPlayerOneTurn = !IsPlayerOneStarting;
+            swapNextStart = false;
+        }
         else
         {
-            Destroy(gameObject);
+            IsPlayerOneTurn = IsPlayerOneStarting;
         }
+    }
+
+    public void SwapNextStarterOnce()
+    {
+        swapNextStart = true;
     }
 
     public void SwitchTurn()
     {
         IsPlayerOneTurn = !IsPlayerOneTurn;
-
-        if (SelectedGameMode == GameMode.PvE && !IsPlayerOneTurn)
-        {
-            Invoke(nameof(MakeAiMove), 0.5f);
-        }
     }
 
-    private void MakeAiMove()
-    {
-        SwitchTurn();
-    }
-
-    public void CheckForWin(int x, int y, string symbol)
+    public bool CheckForWin(int x, int y, string symbol)
     {
         if (CheckDirection(x, y, 1, 0, symbol) ||
             CheckDirection(x, y, 0, 1, symbol) ||
@@ -51,62 +58,46 @@ public class GameManager : MonoBehaviour
             CheckDirection(x, y, 1, -1, symbol))
         {
             EndGame($"{symbol} wins!");
-            return;
+            return true;
         }
 
         if (IsBoardFull())
         {
             EndGame("Draw!");
+            return true;
         }
+
+        return false;
     }
 
-    private bool CheckDirection(int startX, int startY, int dx, int dy, string symbol)
+    private bool CheckDirection(int sx, int sy, int dx, int dy, string sym)
     {
         int count = 1;
-
-        int x = startX + dx;
-        int y = startY + dy;
-        while (InBounds(x, y) && board[x, y].symbolText.text == symbol)
+        int x = sx + dx, y = sy + dy;
+        while (InBounds(x, y) && board[x, y].symbolText.text == sym)
         {
-            count++;
-            x += dx;
-            y += dy;
+            count++; x += dx; y += dy;
         }
-
-        x = startX - dx;
-        y = startY - dy;
-        while (InBounds(x, y) && board[x, y].symbolText.text == symbol)
+        x = sx - dx; y = sy - dy;
+        while (InBounds(x, y) && board[x, y].symbolText.text == sym)
         {
-            count++;
-            x -= dx;
-            y -= dy;
+            count++; x -= dx; y -= dy;
         }
-
         return count >= 4;
     }
 
-    private bool InBounds(int x, int y)
-    {
-        return x >= 0 && x < 5 && y >= 0 && y < 5;
-    }
+    private bool InBounds(int x, int y) => x >= 0 && x < 5 && y >= 0 && y < 5;
 
     private bool IsBoardFull()
     {
-        foreach (var tile in board)
-        {
-            if (tile.symbolText.text == "")
-                return false;
-        }
+        foreach (var t in board)
+            if (t.symbolText.text == "") return false;
         return true;
     }
 
     private void EndGame(string message)
     {
-        foreach (var tile in board)
-        {
-            tile.button.interactable = false;
-        }
-
+        foreach (var t in board) t.button.interactable = false;
         SceneManager.LoadScene("StartScreen");
     }
 }
