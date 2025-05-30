@@ -1,12 +1,14 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
     public enum GameMode { PvP, PvE }
-    public GameMode SelectedGameMode;
+    public enum Difficulty { Easy, Medium, Hard, Custom }
+
+    public GameMode SelectedGameMode { get; set; }
+    public Difficulty SelectedDifficulty { get; set; }
 
     private void Awake()
     {
@@ -19,12 +21,6 @@ public class GameManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
-    }
-
-    public void StartGame(GameMode mode)
-    {
-        SelectedGameMode = mode;
-        SceneManager.LoadScene("GameScene");
     }
 
     public void QuitGame()
