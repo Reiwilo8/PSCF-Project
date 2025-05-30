@@ -1,9 +1,12 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
+
+    public GameStatusUI statusUI;
 
     public enum GameMode { PvP, PvE }
     public enum Difficulty { Easy, Medium, Hard, Custom }
@@ -26,6 +29,24 @@ public class GameManager : MonoBehaviour
         }
         else Destroy(gameObject);
     }
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.name == "GameScene")
+        {
+            statusUI = Object.FindAnyObjectByType<GameStatusUI>();
+            statusUI?.UpdateStatus();
+        }
+    }
 
     public void ResetTurnOrder()
     {
@@ -38,6 +59,8 @@ public class GameManager : MonoBehaviour
         {
             IsPlayerOneTurn = IsPlayerOneStarting;
         }
+
+        statusUI?.UpdateStatus();
     }
 
     public void SwapNextStarterOnce()
@@ -48,6 +71,7 @@ public class GameManager : MonoBehaviour
     public void SwitchTurn()
     {
         IsPlayerOneTurn = !IsPlayerOneTurn;
+        statusUI?.UpdateStatus();
     }
 
     public bool CheckForWin(int x, int y, string symbol)
@@ -57,13 +81,13 @@ public class GameManager : MonoBehaviour
             CheckDirection(x, y, 1, 1, symbol) ||
             CheckDirection(x, y, 1, -1, symbol))
         {
-            EndGame($"{symbol} wins!");
+            EndGame(symbol);
             return true;
         }
 
         if (IsBoardFull())
         {
-            EndGame("Draw!");
+            EndGame("Draw");
             return true;
         }
 
@@ -94,10 +118,29 @@ public class GameManager : MonoBehaviour
             if (t.symbolText.text == "") return false;
         return true;
     }
+    public void LoadSceneWithDelay(string sceneName, float delay)
+    {
+        StartCoroutine(LoadSceneCoroutine(sceneName, delay));
+    }
+    private IEnumerator LoadSceneCoroutine(string sceneName, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        SceneManager.LoadScene(sceneName);
+    }
 
     private void EndGame(string message)
     {
+        if (message == "Draw")
+        {
+            statusUI?.ShowDraw();
+        }
+        else
+        {
+            statusUI?.ShowWin(message);
+        }
+
         foreach (var t in board) t.button.interactable = false;
-        SceneManager.LoadScene("StartScreen");
+
+        LoadSceneWithDelay("StartScreen", 1f);
     }
 }
