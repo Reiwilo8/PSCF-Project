@@ -23,6 +23,7 @@ public class GameModeUI : MonoBehaviour
     private void OnPvPClicked()
     {
         GameManager.Instance.SelectedGameMode = GameManager.GameMode.PvP;
+        SceneManager.LoadScene("GameScene");
     }
 
     private void OnPvEClicked()
