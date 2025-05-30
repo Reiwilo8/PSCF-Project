@@ -5,6 +5,8 @@ using System.Collections;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
+    public GameSceneUI gameSceneUIManager;
+
     public WinLineDrawer winLineDrawer;
     public GameStatusUI statusUI;
     public enum GameMode { PvP, PvE }
@@ -45,6 +47,7 @@ public class GameManager : MonoBehaviour
         if (scene.name == "GameScene")
         {
             statusUI = Object.FindAnyObjectByType<GameStatusUI>();
+            gameSceneUIManager = Object.FindAnyObjectByType<GameSceneUI>();
             winLineDrawer = Object.FindAnyObjectByType<WinLineDrawer>();
             statusUI?.UpdateStatus();
         }
@@ -131,15 +134,15 @@ public class GameManager : MonoBehaviour
         return true;
     }
 
-    public void LoadSceneWithDelay(string sceneName, float delay)
+    public void LoadSceneWithDelay(string message, float delay)
     {
-        StartCoroutine(LoadSceneCoroutine(sceneName, delay));
+        StartCoroutine(LoadSceneCoroutine(message, delay));
     }
 
-    private IEnumerator LoadSceneCoroutine(string sceneName, float delay)
+    private IEnumerator LoadSceneCoroutine(string message, float delay)
     {
         yield return new WaitForSeconds(delay);
-        SceneManager.LoadScene(sceneName);
+        gameSceneUIManager?.OpenEndGameScreen(message);
     }
 
     private void EndGame(string winner)
@@ -157,6 +160,6 @@ public class GameManager : MonoBehaviour
             statusUI.ShowDraw();
         }
 
-            LoadSceneWithDelay("StartScreen", 1f);
+            LoadSceneWithDelay(winner, 1f);
     }
 }
