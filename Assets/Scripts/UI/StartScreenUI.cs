@@ -20,7 +20,7 @@ public class StartScreenUI : MonoBehaviour
 
     void OnPlayClicked()
     {
-        SceneManager.LoadScene("GameModeScreen");
+        SceneManager.LoadScene("GameModeScene");
     }
 
     void OnStatisticsClicked()

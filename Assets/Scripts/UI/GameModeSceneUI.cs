@@ -28,5 +28,6 @@ public class GameModeUI : MonoBehaviour
     private void OnPvEClicked()
     {
         GameManager.Instance.SelectedGameMode = GameManager.GameMode.PvE;
+        SceneManager.LoadScene("DifficultySelectScene");
     }
 }
