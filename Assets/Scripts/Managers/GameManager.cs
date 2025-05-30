@@ -10,6 +10,8 @@ public class GameManager : MonoBehaviour
     public GameMode SelectedGameMode { get; set; }
     public Difficulty SelectedDifficulty { get; set; }
 
+    public bool IsPlayerOneTurn { get; private set; } = true;
+
     private void Awake()
     {
         if (Instance == null)
@@ -26,5 +28,20 @@ public class GameManager : MonoBehaviour
     public void QuitGame()
     {
         Application.Quit();
+    }
+
+    public void SwitchTurn()
+    {
+        IsPlayerOneTurn = !IsPlayerOneTurn;
+
+        if (SelectedGameMode == GameMode.PvE && !IsPlayerOneTurn)
+        {
+            Invoke(nameof(MakeAiMove), 0.5f);
+        }
+    }
+
+    private void MakeAiMove()
+    {
+        SwitchTurn();
     }
 }
