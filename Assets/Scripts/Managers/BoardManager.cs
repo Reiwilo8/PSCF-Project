@@ -20,6 +20,7 @@ public class BoardManager : MonoBehaviour
                 GameObject tileObj = Instantiate(tilePrefab, transform);
                 Tile tile = tileObj.GetComponent<Tile>();
                 tile.Init(x, y);
+                GameManager.Instance.board[x, y] = tile;
             }
         }
     }

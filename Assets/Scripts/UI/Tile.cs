@@ -34,6 +34,7 @@ public class Tile : MonoBehaviour
         isOccupied = true;
         button.interactable = false;
 
+        GameManager.Instance.CheckForWin(coordinates.x, coordinates.y, symbol);
         GameManager.Instance.SwitchTurn();
     }
 }
