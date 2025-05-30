@@ -141,9 +141,11 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator LoadSceneCoroutine(string message, float delay)
     {
-        yield return new WaitForSeconds(delay);
+        yield return new WaitForSecondsRealtime(delay);
+        Time.timeScale = 0f;
         gameSceneUIManager?.OpenEndGameScreen(message);
     }
+
 
     private void EndGame(string winner)
     {
