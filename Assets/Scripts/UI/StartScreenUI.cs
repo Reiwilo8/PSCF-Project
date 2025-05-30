@@ -35,6 +35,6 @@ public class StartScreenUI : MonoBehaviour
 
     void OnExitClicked()
     {
-        GameManager.Instance.QuitGame();
+        Application.Quit();
     }
 }
