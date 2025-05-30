@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class StartScreenUI : MonoBehaviour
@@ -19,7 +20,7 @@ public class StartScreenUI : MonoBehaviour
 
     void OnPlayClicked()
     {
-        
+        SceneManager.LoadScene("GameModeScreen");
     }
 
     void OnStatisticsClicked()

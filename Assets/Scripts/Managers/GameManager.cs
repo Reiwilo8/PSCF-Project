@@ -5,7 +5,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
-    public enum GameMode { PvP, PvE_Easy, PvE_Medium, PvE_Hard, PvE_Custom }
+    public enum GameMode { PvP, PvE }
     public GameMode SelectedGameMode;
 
     private void Awake()
