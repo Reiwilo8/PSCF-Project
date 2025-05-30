@@ -258,6 +258,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 307313941}
+  - component: {fileID: 307313942}
   m_Layer: 5
   m_Name: BoardRoot
   m_TagString: Untagged
@@ -286,6 +287,22 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 700, y: 700}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &307313942
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 307313940}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ca405f98a856d74bb312d7ff4ddd0bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  boardArea: {fileID: 2008558656}
+  linePrefab: {fileID: 316425580971119719, guid: 7289ba90cd1a528478c6fdcd64cf979e, type: 3}
+  thickness: 15
+  lineColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
 --- !u!1001 &880186039
 PrefabInstance:
   m_ObjectHideFlags: 0

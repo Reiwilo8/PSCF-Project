@@ -5,9 +5,8 @@ using System.Collections;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
-
+    public WinLineDrawer winLineDrawer;
     public GameStatusUI statusUI;
-
     public enum GameMode { PvP, PvE }
     public enum Difficulty { Easy, Medium, Hard, Custom }
 
@@ -19,6 +18,8 @@ public class GameManager : MonoBehaviour
     private bool swapNextStart = false;
 
     public Tile[,] board = new Tile[5, 5];
+
+    private Vector2Int winStart, winEnd;
 
     private void Awake()
     {
@@ -44,6 +45,7 @@ public class GameManager : MonoBehaviour
         if (scene.name == "GameScene")
         {
             statusUI = Object.FindAnyObjectByType<GameStatusUI>();
+            winLineDrawer = Object.FindAnyObjectByType<WinLineDrawer>();
             statusUI?.UpdateStatus();
         }
     }
@@ -63,10 +65,7 @@ public class GameManager : MonoBehaviour
         statusUI?.UpdateStatus();
     }
 
-    public void SwapNextStarterOnce()
-    {
-        swapNextStart = true;
-    }
+    public void SwapNextStarterOnce() => swapNextStart = true;
 
     public void SwitchTurn()
     {
@@ -76,10 +75,10 @@ public class GameManager : MonoBehaviour
 
     public bool CheckForWin(int x, int y, string symbol)
     {
-        if (CheckDirection(x, y, 1, 0, symbol) ||
-            CheckDirection(x, y, 0, 1, symbol) ||
-            CheckDirection(x, y, 1, 1, symbol) ||
-            CheckDirection(x, y, 1, -1, symbol))
+        if (FindWinLine(x, y, 1, 0, symbol) ||
+            FindWinLine(x, y, 0, 1, symbol) ||
+            FindWinLine(x, y, 1, 1, symbol) ||
+            FindWinLine(x, y, 1, -1, symbol))
         {
             EndGame(symbol);
             return true;
@@ -94,20 +93,33 @@ public class GameManager : MonoBehaviour
         return false;
     }
 
-    private bool CheckDirection(int sx, int sy, int dx, int dy, string sym)
+    private bool FindWinLine(int sx, int sy, int dx, int dy, string sym)
     {
         int count = 1;
+        Vector2Int s = new Vector2Int(sx, sy);
+        Vector2Int e = new Vector2Int(sx, sy);
+
         int x = sx + dx, y = sy + dy;
         while (InBounds(x, y) && board[x, y].symbolText.text == sym)
         {
+            e = new Vector2Int(x, y);
             count++; x += dx; y += dy;
         }
+
         x = sx - dx; y = sy - dy;
         while (InBounds(x, y) && board[x, y].symbolText.text == sym)
         {
+            s = new Vector2Int(x, y);
             count++; x -= dx; y -= dy;
         }
-        return count >= 4;
+
+        if (count >= 4)
+        {
+            winStart = s;
+            winEnd = e;
+            return true;
+        }
+        return false;
     }
 
     private bool InBounds(int x, int y) => x >= 0 && x < 5 && y >= 0 && y < 5;
@@ -118,29 +130,33 @@ public class GameManager : MonoBehaviour
             if (t.symbolText.text == "") return false;
         return true;
     }
+
     public void LoadSceneWithDelay(string sceneName, float delay)
     {
         StartCoroutine(LoadSceneCoroutine(sceneName, delay));
     }
+
     private IEnumerator LoadSceneCoroutine(string sceneName, float delay)
     {
         yield return new WaitForSeconds(delay);
         SceneManager.LoadScene(sceneName);
     }
 
-    private void EndGame(string message)
+    private void EndGame(string winner)
     {
-        if (message == "Draw")
+        foreach (var t in board)
+            t.button.interactable = false;
+
+        if (winner != "Draw")
         {
-            statusUI?.ShowDraw();
+            winLineDrawer?.DrawLine(winStart, winEnd);
+            statusUI.ShowWin(winner);
         }
         else
         {
-            statusUI?.ShowWin(message);
+            statusUI.ShowDraw();
         }
 
-        foreach (var t in board) t.button.interactable = false;
-
-        LoadSceneWithDelay("StartScreen", 1f);
+            LoadSceneWithDelay("StartScreen", 1f);
     }
 }
