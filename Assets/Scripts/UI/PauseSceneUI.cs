@@ -26,6 +26,7 @@ public class PauseSceneUI : MonoBehaviour
     private void OnRestartClicked()
     {
         Time.timeScale = 1f;
+        GameManager.Instance.RestartWithCurrentStarter();
         SceneManager.UnloadSceneAsync("PauseScene");
         SceneManager.LoadScene("GameScene");
     }
@@ -33,10 +34,11 @@ public class PauseSceneUI : MonoBehaviour
     private void OnSwapClicked()
     {
         Time.timeScale = 1f;
-        GameManager.Instance.SwapNextStarterOnce();
+        GameManager.Instance.RestartWithSwappedStarter();
         SceneManager.UnloadSceneAsync("PauseScene");
         SceneManager.LoadScene("GameScene");
     }
+
 
     private void OnMenuClicked()
     {
