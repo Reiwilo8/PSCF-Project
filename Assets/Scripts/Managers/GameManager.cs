@@ -19,6 +19,9 @@ public class GameManager : MonoBehaviour
     public bool IsPlayerOneTurn { get; private set; }
     private bool swapNextStart = false;
 
+    private bool overrideStarterNextGame = false;
+    private bool overrideStarterValue = true;
+
     public Tile[,] board = new Tile[5, 5];
 
     private Vector2Int winStart, winEnd;
@@ -52,10 +55,14 @@ public class GameManager : MonoBehaviour
             statusUI?.UpdateStatus();
         }
     }
-
     public void ResetTurnOrder()
     {
-        if (swapNextStart)
+        if (overrideStarterNextGame)
+        {
+            IsPlayerOneTurn = overrideStarterValue;
+            overrideStarterNextGame = false;
+        }
+        else if (swapNextStart)
         {
             IsPlayerOneTurn = !IsPlayerOneStarting;
             swapNextStart = false;
@@ -69,6 +76,18 @@ public class GameManager : MonoBehaviour
     }
 
     public void SwapNextStarterOnce() => swapNextStart = true;
+
+    public void RestartWithCurrentStarter()
+    {
+        overrideStarterNextGame = true;
+        overrideStarterValue = IsPlayerOneTurn;
+    }
+
+    public void RestartWithSwappedStarter()
+    {
+        overrideStarterNextGame = true;
+        overrideStarterValue = !IsPlayerOneTurn;
+    }
 
     public void SwitchTurn()
     {
