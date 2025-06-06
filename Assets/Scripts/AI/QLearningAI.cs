@@ -30,8 +30,31 @@ public class QLearningAI : MonoBehaviour
 
     public void InitAI()
     {
+        switch (GameManager.Instance.SelectedDifficulty)
+        {
+            case Difficulty.Easy:
+                epsilon = 0.9f;
+                alpha = 0.3f;
+                gamma = 0.5f;
+                break;
+            case Difficulty.Medium:
+                epsilon = 0.5f;
+                alpha = 0.5f;
+                gamma = 0.7f;
+                break;
+            case Difficulty.Hard:
+                epsilon = 0.1f;
+                alpha = 0.7f;
+                gamma = 0.9f;
+                break;
+            case Difficulty.Custom:
+                break;
+        }
+
+        qTable.Clear();
         episodeHistory.Clear();
     }
+
 
     public void SetAISymbol(string symbol)
     {
