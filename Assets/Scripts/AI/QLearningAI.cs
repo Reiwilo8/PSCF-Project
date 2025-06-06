@@ -48,6 +48,9 @@ public class QLearningAI : MonoBehaviour
                 gamma = 0.9f;
                 break;
             case Difficulty.Custom:
+                epsilon = GameManager.Instance.CustomEpsilon;
+                alpha = GameManager.Instance.CustomAlpha;
+                gamma = GameManager.Instance.CustomGamma;
                 break;
         }
 

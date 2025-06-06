@@ -31,6 +31,7 @@ public class EndGameUI : MonoBehaviour
 
     void OnMenuClicked()
     {
+        GameManager.Instance.ResetAllFlags();
         SceneManager.LoadScene("StartScreen");
     }
 }

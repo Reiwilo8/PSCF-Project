@@ -42,6 +42,7 @@ public class PauseSceneUI : MonoBehaviour
     private void OnMenuClicked()
     {
         Time.timeScale = 1f;
+        GameManager.Instance.ResetAllFlags();
         SceneManager.LoadScene("StartScreen");
     }
 }

@@ -29,6 +29,8 @@ public class DifficultySelectUI : MonoBehaviour
         GameManager.Instance.SetGameMode(GameMode.PvE);
         GameManager.Instance.SetDifficulty(difficulty);
 
-        SceneManager.LoadScene("GameScene");
+        string sceneName = difficulty == Difficulty.Custom ? "CustomDifficultySettingsScene" : "GameScene";
+
+        SceneManager.LoadScene(sceneName);
     }
 }

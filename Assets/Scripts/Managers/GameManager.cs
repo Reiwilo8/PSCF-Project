@@ -18,6 +18,10 @@ public class GameManager : MonoBehaviour
     public GameMode SelectedGameMode { get; set; }
     public Difficulty SelectedDifficulty { get; set; }
 
+    public float CustomEpsilon { get; set; } = 0.1f;
+    public float CustomAlpha { get; set; } = 0.5f;
+    public float CustomGamma { get; set; } = 0.9f;
+
     public bool IsPlayerOneStarting { get; private set; } = true;
     public bool IsPlayerOneTurn { get; private set; }
 
@@ -148,7 +152,7 @@ public class GameManager : MonoBehaviour
 
             string message = $"{symbol} Wins";
 
-            LoadSceneWithDelay(message, SelectedGameMode == GameMode.PvE ? 0.2f : 1f);
+            LoadSceneWithDelay(message, 1f);
         }
         else if (IsBoardFull())
         {
@@ -163,7 +167,7 @@ public class GameManager : MonoBehaviour
                 qLearningAI.LearnFromEpisode(message);
             }
 
-            LoadSceneWithDelay(message, SelectedGameMode == GameMode.PvE ? 0.2f : 1f);
+            LoadSceneWithDelay(message, 1f);
         }
         else
         {
@@ -276,5 +280,13 @@ public class GameManager : MonoBehaviour
         for (int x = 0; x < 5; x++)
             for (int y = 0; y < 5; y++)
                 board[x, y].button.interactable = false;
+    }
+
+    public void ResetAllFlags()
+    {
+        swapNextStart = false;
+        overrideStarterNextGame = false;
+        gameEnded = false;
+        IsPlayerOneTurn = IsPlayerOneStarting;
     }
 }
