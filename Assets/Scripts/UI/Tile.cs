@@ -24,6 +24,8 @@ public class Tile : MonoBehaviour
     {
         if (isOccupied) return;
 
+        if (GameManager.Instance.SelectedGameMode == GameMode.PvE && GameManager.Instance.IsPlayerOneTurn == false) return;
+
         string symbol = GameManager.Instance.IsPlayerOneTurn ? "X" : "O";
         GameManager.Instance.RegisterMove(coordinates.x, coordinates.y, symbol);
     }

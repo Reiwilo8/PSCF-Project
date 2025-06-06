@@ -9,6 +9,16 @@ public class QLearningAI : MonoBehaviour
 
     private Dictionary<string, float[]> qTable = new Dictionary<string, float[]>();
 
+    private void EnsureStateExists(string stateKey)
+    {
+        if (!qTable.ContainsKey(stateKey))
+        {
+            qTable[stateKey] = new float[boardSize * boardSize];
+            for (int i = 0; i < boardSize * boardSize; i++)
+                qTable[stateKey][i] = 0f;
+        }
+    }
+
     private List<(string state, int action)> episodeHistory = new List<(string, int)>();
     private readonly int boardSize = 5;
     private readonly int winLength = 4;
@@ -131,15 +141,23 @@ public class QLearningAI : MonoBehaviour
 
     private void UpdateQ(string stateKey, int action, float reward, string nextStateKey)
     {
+        EnsureStateExists(stateKey);
+
+        if (!string.IsNullOrEmpty(nextStateKey))
+        {
+            EnsureStateExists(nextStateKey);
+        }
+
         float[] qValues = qTable[stateKey];
         float qSA = qValues[action];
         float maxQNext = 0f;
 
-        if (!string.IsNullOrEmpty(nextStateKey) && qTable.ContainsKey(nextStateKey))
+        if (!string.IsNullOrEmpty(nextStateKey))
         {
             float[] qNext = qTable[nextStateKey];
             float maxVal = float.MinValue;
-            foreach (float v in qNext) if (v > maxVal) maxVal = v;
+            foreach (float v in qNext)
+                if (v > maxVal) maxVal = v;
             maxQNext = maxVal;
         }
 

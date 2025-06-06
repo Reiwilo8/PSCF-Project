@@ -114,7 +114,7 @@ public class GameManager : MonoBehaviour
 
         if (SelectedGameMode == GameMode.PvE && !IsPlayerOneTurn)
         {
-            Invoke(nameof(MakeAiMove), 0.5f);
+            StartCoroutine(DelayedAIMove());
         }
 
         gameEnded = false;
@@ -146,7 +146,9 @@ public class GameManager : MonoBehaviour
                 qLearningAI.LearnFromEpisode(symbol);
             }
 
-            StartCoroutine(LoadSceneCoroutine($"{symbol} Wins", 1f));
+            string message = $"{symbol} Wins";
+
+            LoadSceneWithDelay(message, SelectedGameMode == GameMode.PvE ? 0.2f : 1f);
         }
         else if (IsBoardFull())
         {
@@ -154,12 +156,14 @@ public class GameManager : MonoBehaviour
             statusUI.ShowDraw();
             BlockAllTiles();
 
+            const string message = "Draw";
+
             if (SelectedGameMode == GameMode.PvE && qLearningAI != null)
             {
-                qLearningAI.LearnFromEpisode("Draw");
+                qLearningAI.LearnFromEpisode(message);
             }
 
-            StartCoroutine(LoadSceneCoroutine("Draw", 1f));
+            LoadSceneWithDelay(message, SelectedGameMode == GameMode.PvE ? 0.2f : 1f);
         }
         else
         {
@@ -183,6 +187,12 @@ public class GameManager : MonoBehaviour
         foreach (var t in board)
             if (!t.IsOccupied) return false;
         return true;
+    }
+
+    private IEnumerator DelayedAIMove()
+    {
+        yield return new WaitForEndOfFrame();
+        MakeAiMove();
     }
 
     private void MakeAiMove()
