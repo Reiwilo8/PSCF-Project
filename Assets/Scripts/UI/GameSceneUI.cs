@@ -22,22 +22,4 @@ public class GameSceneUI : MonoBehaviour
         SceneManager.LoadScene("EndGameScene", LoadSceneMode.Additive);
         Time.timeScale = 0f;
     }
-
-    public void ResumeGame()
-    {
-        Time.timeScale = 1f;
-        SceneManager.UnloadSceneAsync("PauseScene");
-    }
-
-    public void RestartGame()
-    {
-        Time.timeScale = 1f;
-        SceneManager.LoadScene("GameScene");
-    }
-
-    public void QuitToMainMenu()
-    {
-        Time.timeScale = 1f;
-        SceneManager.LoadScene("StartScreen");
-    }
 }
