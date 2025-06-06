@@ -13,6 +13,8 @@ public class GameManager : MonoBehaviour
     public GameStatusUI statusUI;
     public WinLineDrawer winLineDrawer;
 
+    public QLearningAI qLearningAI;
+
     public GameMode SelectedGameMode { get; set; }
     public Difficulty SelectedDifficulty { get; set; }
 
@@ -56,7 +58,9 @@ public class GameManager : MonoBehaviour
             gameSceneUIManager = Object.FindAnyObjectByType<GameSceneUI>();
             statusUI = Object.FindAnyObjectByType<GameStatusUI>();
             winLineDrawer = Object.FindAnyObjectByType<WinLineDrawer>();
+            qLearningAI = Object.FindAnyObjectByType<QLearningAI>();
 
+            qLearningAI?.InitAI();
             ResetTurnOrder();
             ResetBoard();
             statusUI?.UpdateStatus();
@@ -102,6 +106,17 @@ public class GameManager : MonoBehaviour
 
         currentRoundStarter = IsPlayerOneTurn;
 
+        if (SelectedGameMode == GameMode.PvE && qLearningAI != null)
+        {
+            string aiSymbol = IsPlayerOneTurn ? "O" : "X";
+            qLearningAI.SetAISymbol(aiSymbol);
+        }
+
+        if (SelectedGameMode == GameMode.PvE && !IsPlayerOneTurn)
+        {
+            Invoke(nameof(MakeAiMove), 0.5f);
+        }
+
         gameEnded = false;
         statusUI?.UpdateStatus();
     }
@@ -113,11 +128,24 @@ public class GameManager : MonoBehaviour
 
         board[x, y].SetSymbol(symbol);
 
+        if (SelectedGameMode == GameMode.PvE && qLearningAI != null && !gameEnded)
+        {
+            string state = qLearningAI.BuildStateString(board);
+            int action = y * 5 + x;
+            qLearningAI.RecordStep(state, action);
+        }
+
         if (CheckForWin(x, y, symbol))
         {
             gameEnded = true;
             statusUI.ShowWin(symbol);
             BlockAllTiles();
+
+            if (SelectedGameMode == GameMode.PvE && qLearningAI != null)
+            {
+                qLearningAI.LearnFromEpisode(symbol);
+            }
+
             StartCoroutine(LoadSceneCoroutine($"{symbol} Wins", 1f));
         }
         else if (IsBoardFull())
@@ -125,6 +153,12 @@ public class GameManager : MonoBehaviour
             gameEnded = true;
             statusUI.ShowDraw();
             BlockAllTiles();
+
+            if (SelectedGameMode == GameMode.PvE && qLearningAI != null)
+            {
+                qLearningAI.LearnFromEpisode("Draw");
+            }
+
             StartCoroutine(LoadSceneCoroutine("Draw", 1f));
         }
         else
@@ -137,6 +171,11 @@ public class GameManager : MonoBehaviour
     {
         IsPlayerOneTurn = !IsPlayerOneTurn;
         statusUI?.UpdateStatus();
+
+        if (!gameEnded && SelectedGameMode == GameMode.PvE && !IsPlayerOneTurn)
+        {
+            Invoke(nameof(MakeAiMove), 0.5f);
+        }
     }
 
     private bool IsBoardFull()
@@ -144,6 +183,20 @@ public class GameManager : MonoBehaviour
         foreach (var t in board)
             if (!t.IsOccupied) return false;
         return true;
+    }
+
+    private void MakeAiMove()
+    {
+        if (qLearningAI == null) return;
+
+        int actionIndex = qLearningAI.GetNextMove(board, IsPlayerOneTurn);
+
+        int ax = actionIndex % 5;
+        int ay = actionIndex / 5;
+
+        string aiSymbol = IsPlayerOneTurn ? "X" : "O";
+
+        RegisterMove(ax, ay, aiSymbol);
     }
 
     private bool CheckForWin(int sx, int sy, string sym)

@@ -25,7 +25,6 @@ public class Tile : MonoBehaviour
         if (isOccupied) return;
 
         string symbol = GameManager.Instance.IsPlayerOneTurn ? "X" : "O";
-
         GameManager.Instance.RegisterMove(coordinates.x, coordinates.y, symbol);
     }
 
@@ -34,5 +33,15 @@ public class Tile : MonoBehaviour
         symbolText.text = symbol;
         isOccupied = true;
         button.interactable = false;
+    }
+
+    public string GetSymbol()
+    {
+        return symbolText.text;
+    }
+
+    public bool IsEmpty()
+    {
+        return !isOccupied;
     }
 }
