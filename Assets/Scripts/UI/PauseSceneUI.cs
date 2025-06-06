@@ -39,7 +39,6 @@ public class PauseSceneUI : MonoBehaviour
         SceneManager.LoadScene("GameScene");
     }
 
-
     private void OnMenuClicked()
     {
         Time.timeScale = 1f;

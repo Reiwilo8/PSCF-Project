@@ -13,10 +13,10 @@ public class DifficultySelectUI : MonoBehaviour
     private void Start()
     {
         backButton.onClick.AddListener(OnBackClicked);
-        easyButton.onClick.AddListener(() => OnDifficultySelected(GameManager.Difficulty.Easy));
-        mediumButton.onClick.AddListener(() => OnDifficultySelected(GameManager.Difficulty.Medium));
-        hardButton.onClick.AddListener(() => OnDifficultySelected(GameManager.Difficulty.Hard));
-        customButton.onClick.AddListener(() => OnDifficultySelected(GameManager.Difficulty.Custom));
+        easyButton.onClick.AddListener(() => OnDifficultySelected(Difficulty.Easy));
+        mediumButton.onClick.AddListener(() => OnDifficultySelected(Difficulty.Medium));
+        hardButton.onClick.AddListener(() => OnDifficultySelected(Difficulty.Hard));
+        customButton.onClick.AddListener(() => OnDifficultySelected(Difficulty.Custom));
     }
 
     void OnBackClicked()
@@ -24,10 +24,10 @@ public class DifficultySelectUI : MonoBehaviour
         SceneManager.LoadScene("GameModeScene");
     }
 
-    void OnDifficultySelected(GameManager.Difficulty difficulty)
+    void OnDifficultySelected(Difficulty difficulty)
     {
-        GameManager.Instance.SelectedGameMode = GameManager.GameMode.PvE;
-        GameManager.Instance.SelectedDifficulty = difficulty;
+        GameManager.Instance.SetGameMode(GameMode.PvE);
+        GameManager.Instance.SetDifficulty(difficulty);
 
         SceneManager.LoadScene("GameScene");
     }

@@ -8,7 +8,6 @@ public class BoardManager : MonoBehaviour
 
     private void Start()
     {
-        GameManager.Instance.ResetTurnOrder();
         GenerateBoard();
     }
 

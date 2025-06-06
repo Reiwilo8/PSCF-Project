@@ -14,12 +14,12 @@ public class GameStatusUI : MonoBehaviour
     {
         var gm = GameManager.Instance;
 
-        if (gm.SelectedGameMode == GameManager.GameMode.PvP)
+        if (gm.SelectedGameMode == GameMode.PvP)
         {
             string symbol = gm.IsPlayerOneTurn ? "X" : "O";
             statusText.text = $"{symbol}'s Turn";
         }
-        else if (gm.SelectedGameMode == GameManager.GameMode.PvE)
+        else if (gm.SelectedGameMode == GameMode.PvE)
         {
             statusText.text = $"{gm.SelectedDifficulty}";
         }

@@ -8,6 +8,7 @@ public class Tile : MonoBehaviour
     public Button button;
     public TextMeshProUGUI symbolText;
     private bool isOccupied = false;
+    public bool IsOccupied => isOccupied;
 
     public void Init(int x, int y)
     {
@@ -24,12 +25,14 @@ public class Tile : MonoBehaviour
         if (isOccupied) return;
 
         string symbol = GameManager.Instance.IsPlayerOneTurn ? "X" : "O";
+
+        GameManager.Instance.RegisterMove(coordinates.x, coordinates.y, symbol);
+    }
+
+    public void SetSymbol(string symbol)
+    {
         symbolText.text = symbol;
         isOccupied = true;
         button.interactable = false;
-
-        bool ended = GameManager.Instance.CheckForWin(coordinates.x, coordinates.y, symbol);
-        if (!ended)
-            GameManager.Instance.SwitchTurn();
     }
 }
