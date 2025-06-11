@@ -17,13 +17,11 @@ public class EndGameUI : MonoBehaviour
 
     void OnRematchClicked()
     {
-        Time.timeScale = 1f;
         SceneManager.LoadScene("GameScene");
     }
 
     void OnSwapClicked()
     {
-        Time.timeScale = 1f;
         GameManager.Instance.SwapNextStarterOnce();
         SceneManager.LoadScene("GameScene");
     }

@@ -182,7 +182,7 @@ public class GameManager : MonoBehaviour
 
         if (!gameEnded && SelectedGameMode == GameMode.PvE && !IsPlayerOneTurn)
         {
-            Invoke(nameof(MakeAiMove), 0.5f);
+            StartCoroutine(DelayedAIMove());
         }
     }
 
@@ -195,7 +195,7 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator DelayedAIMove()
     {
-        yield return new WaitForEndOfFrame();
+        yield return new WaitForSecondsRealtime(0.5f);
         MakeAiMove();
     }
 
@@ -264,7 +264,6 @@ public class GameManager : MonoBehaviour
     private IEnumerator LoadSceneCoroutine(string message, float delay)
     {
         yield return new WaitForSecondsRealtime(delay);
-        Time.timeScale = 0f;
         gameSceneUIManager?.OpenEndGameScreen(message);
     }
 
@@ -288,5 +287,7 @@ public class GameManager : MonoBehaviour
         overrideStarterNextGame = false;
         gameEnded = false;
         IsPlayerOneTurn = IsPlayerOneStarting;
+        CancelInvoke();
+        StopAllCoroutines();
     }
 }
