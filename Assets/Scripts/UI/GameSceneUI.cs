@@ -13,13 +13,11 @@ public class GameSceneUI : MonoBehaviour
     public void OnPauseClicked()
     {
         SceneManager.LoadScene("PauseScene", LoadSceneMode.Additive);
-        Time.timeScale = 0f;
     }
 
     public void OpenEndGameScreen(string result)
     {
         PlayerPrefs.SetString("EndGameResult", result);
         SceneManager.LoadScene("EndGameScene", LoadSceneMode.Additive);
-        Time.timeScale = 0f;
     }
 }
