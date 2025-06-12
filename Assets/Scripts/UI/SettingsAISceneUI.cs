@@ -12,6 +12,6 @@ public class SettingsAIUI : MonoBehaviour
 
     private void OnResetClicked()
     {
-
+        QTableIO.Reset();
     }
 }
