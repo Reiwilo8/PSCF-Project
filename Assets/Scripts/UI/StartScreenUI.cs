@@ -30,7 +30,7 @@ public class StartScreenUI : MonoBehaviour
 
     void OnSettingsClicked()
     {
-        
+        SceneManager.LoadScene("SettingsScene");
     }
 
     void OnExitClicked()

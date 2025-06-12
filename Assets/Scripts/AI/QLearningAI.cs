@@ -9,6 +9,16 @@ public class QLearningAI : MonoBehaviour
 
     private Dictionary<string, float[]> qTable = new Dictionary<string, float[]>();
 
+    public void SaveQTable()
+    {
+        QTableIO.Save(qTable);
+    }
+
+    public void LoadQTable()
+    {
+        qTable = QTableIO.Load();
+    }
+
     private void EnsureStateExists(string stateKey)
     {
         if (!qTable.ContainsKey(stateKey))
@@ -54,7 +64,7 @@ public class QLearningAI : MonoBehaviour
                 break;
         }
 
-        qTable.Clear();
+        LoadQTable();
         episodeHistory.Clear();
     }
 
@@ -158,6 +168,7 @@ public class QLearningAI : MonoBehaviour
         }
 
         episodeHistory.Clear();
+        SaveQTable();
     }
 
     public void RecordStep(string state, int action)
