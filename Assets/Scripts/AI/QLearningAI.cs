@@ -9,38 +9,15 @@ public class QLearningAI : MonoBehaviour
 
     private Dictionary<string, float[]> qTable = new Dictionary<string, float[]>();
 
-    private string SavePath => Application.persistentDataPath + "/qtable.json";
-
     public void SaveQTable()
     {
-        QTableWrapper wrapper = new QTableWrapper();
-        foreach (var pair in qTable)
-        {
-            wrapper.entries.Add(new QEntry { state = pair.Key, qValues = pair.Value });
-        }
-
-        string json = JsonUtility.ToJson(wrapper, true);
-        System.IO.File.WriteAllText(SavePath, json);
+        QTableIO.Save(qTable);
     }
 
     public void LoadQTable()
     {
-        if (System.IO.File.Exists(SavePath))
-        {
-            string json = System.IO.File.ReadAllText(SavePath);
-            QTableWrapper wrapper = JsonUtility.FromJson<QTableWrapper>(json);
-            qTable.Clear();
-            foreach (var entry in wrapper.entries)
-            {
-                qTable[entry.state] = entry.qValues;
-            }
-        }
-        else
-        {
-
-        }
+        qTable = QTableIO.Load();
     }
-
 
     private void EnsureStateExists(string stateKey)
     {
