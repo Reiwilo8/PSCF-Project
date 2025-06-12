@@ -9,6 +9,39 @@ public class QLearningAI : MonoBehaviour
 
     private Dictionary<string, float[]> qTable = new Dictionary<string, float[]>();
 
+    private string SavePath => Application.persistentDataPath + "/qtable.json";
+
+    public void SaveQTable()
+    {
+        QTableWrapper wrapper = new QTableWrapper();
+        foreach (var pair in qTable)
+        {
+            wrapper.entries.Add(new QEntry { state = pair.Key, qValues = pair.Value });
+        }
+
+        string json = JsonUtility.ToJson(wrapper, true);
+        System.IO.File.WriteAllText(SavePath, json);
+    }
+
+    public void LoadQTable()
+    {
+        if (System.IO.File.Exists(SavePath))
+        {
+            string json = System.IO.File.ReadAllText(SavePath);
+            QTableWrapper wrapper = JsonUtility.FromJson<QTableWrapper>(json);
+            qTable.Clear();
+            foreach (var entry in wrapper.entries)
+            {
+                qTable[entry.state] = entry.qValues;
+            }
+        }
+        else
+        {
+
+        }
+    }
+
+
     private void EnsureStateExists(string stateKey)
     {
         if (!qTable.ContainsKey(stateKey))
@@ -54,6 +87,7 @@ public class QLearningAI : MonoBehaviour
                 break;
         }
 
+        LoadQTable();
         episodeHistory.Clear();
     }
 
@@ -157,6 +191,7 @@ public class QLearningAI : MonoBehaviour
         }
 
         episodeHistory.Clear();
+        SaveQTable();
     }
 
     public void RecordStep(string state, int action)
