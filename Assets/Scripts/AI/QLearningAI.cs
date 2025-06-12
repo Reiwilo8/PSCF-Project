@@ -54,7 +54,6 @@ public class QLearningAI : MonoBehaviour
                 break;
         }
 
-        qTable.Clear();
         episodeHistory.Clear();
     }
 
