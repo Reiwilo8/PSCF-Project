@@ -119,52 +119,7 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &166785140
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 166785142}
-  - component: {fileID: 166785141}
-  m_Layer: 0
-  m_Name: UIManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &166785141
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 166785140}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 966806e9dcd8f5046923179db7e00425, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  resetButton: {fileID: 1134564513}
---- !u!4 &166785142
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 166785140}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &1134564512
+--- !u!1001 &1576574618
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -334,7 +289,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7257583687962942632, guid: 729820d0a8a380943a87817b52e05d47, type: 3}
       propertyPath: m_text
-      value: Profile
+      value: PvP
       objectReference: {fileID: 0}
     - target: {fileID: 7257583687962942632, guid: 729820d0a8a380943a87817b52e05d47, type: 3}
       propertyPath: m_RaycastTarget
@@ -366,7 +321,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8673033311845679709, guid: 729820d0a8a380943a87817b52e05d47, type: 3}
       propertyPath: m_Name
-      value: ResetProfileButton
+      value: ResetAIButton
       objectReference: {fileID: 0}
     - target: {fileID: 9082267066095490298, guid: 729820d0a8a380943a87817b52e05d47, type: 3}
       propertyPath: m_AnchorMax.x
@@ -385,23 +340,12 @@ PrefabInstance:
     - {fileID: 4623941264461557646, guid: 729820d0a8a380943a87817b52e05d47, type: 3}
     - {fileID: 7412841927586326799, guid: 729820d0a8a380943a87817b52e05d47, type: 3}
     - {fileID: 4138090580445953924, guid: 729820d0a8a380943a87817b52e05d47, type: 3}
+    - {fileID: 2378314164775761589, guid: 729820d0a8a380943a87817b52e05d47, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 729820d0a8a380943a87817b52e05d47, type: 3}
---- !u!114 &1134564513 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 853833280469287222, guid: 729820d0a8a380943a87817b52e05d47, type: 3}
-  m_PrefabInstance: {fileID: 1134564512}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 1134564512}
-  - {fileID: 166785142}
+  - {fileID: 1576574618}
