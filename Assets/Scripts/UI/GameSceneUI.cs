@@ -12,6 +12,7 @@ public class GameSceneUI : MonoBehaviour
     }
     public void OnPauseClicked()
     {
+        GameManager.Instance.PauseTime();
         SceneManager.LoadScene("PauseScene", LoadSceneMode.Additive);
     }
 
