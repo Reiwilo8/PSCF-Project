@@ -9,12 +9,23 @@ public class SettingsSceneUI : MonoBehaviour
     private void Start()
     {
         backButton.onClick.AddListener(OnBackClicked);
-        SceneManager.LoadScene("SettingsAIScene", LoadSceneMode.Additive);
+        SceneManager.LoadScene("SettingsProfileScene", LoadSceneMode.Additive);
+        //SceneManager.LoadScene("SettingsAIScene", LoadSceneMode.Additive);
     }
 
     private void OnBackClicked()
     {
-        SceneManager.UnloadSceneAsync("SettingsAIScene");
+        UnloadIfLoaded("SettingsProfileScene");
+        UnloadIfLoaded("SettingsAIScene");
         SceneManager.LoadScene("StartScreen");
+    }
+
+    private void UnloadIfLoaded(string sceneName)
+    {
+        var scene = SceneManager.GetSceneByName(sceneName);
+        if (scene.isLoaded)
+        {
+            SceneManager.UnloadSceneAsync(scene);
+        }
     }
 }
