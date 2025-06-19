@@ -25,7 +25,7 @@ public class StartScreenUI : MonoBehaviour
 
     void OnStatisticsClicked()
     {
-        
+        SceneManager.LoadScene("StatisticsScene");
     }
 
     void OnSettingsClicked()
@@ -35,6 +35,7 @@ public class StartScreenUI : MonoBehaviour
 
     void OnExitClicked()
     {
+        StatsManager.Instance.SaveStats();
         Application.Quit();
     }
 }

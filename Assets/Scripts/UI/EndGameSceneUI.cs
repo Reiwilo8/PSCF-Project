@@ -17,12 +17,14 @@ public class EndGameUI : MonoBehaviour
 
     void OnRematchClicked()
     {
+        SceneManager.UnloadSceneAsync("EndGameScene");
         SceneManager.LoadScene("GameScene");
     }
 
     void OnSwapClicked()
     {
         GameManager.Instance.SwapNextStarterOnce();
+        SceneManager.UnloadSceneAsync("EndGameScene");
         SceneManager.LoadScene("GameScene");
     }
 

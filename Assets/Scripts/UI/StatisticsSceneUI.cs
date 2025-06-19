@@ -3,22 +3,24 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Collections;
 
-public class SettingsSceneUI : MonoBehaviour
+public class StatisticsSceneUI : MonoBehaviour
 {
     public Button backButton;
-    public Button profileButton;
-    public Button aiButton;
+    public Button timeButton;
+    public Button pvpButton;
+    public Button pveButton;
 
     private string currentScene;
     private bool isTransitioning = false;
 
     private void Start()
     {
-        currentScene = "SettingsProfileScene";
+        currentScene = "StatisticsTimeScene";
 
         backButton.onClick.AddListener(OnBackClicked);
-        profileButton.onClick.AddListener(() => SwitchToScene("SettingsProfileScene"));
-        aiButton.onClick.AddListener(() => SwitchToScene("SettingsAIScene"));
+        timeButton.onClick.AddListener(() => SwitchToScene("StatisticsTimeScene"));
+        pvpButton.onClick.AddListener(() => SwitchToScene("StatisticsPvPScene"));
+        pveButton.onClick.AddListener(() => SwitchToScene("StatisticsPvEScene"));
 
         StartCoroutine(LoadInitialScene());
     }
@@ -77,15 +79,17 @@ public class SettingsSceneUI : MonoBehaviour
 
     private void UpdateButtonStates()
     {
-        profileButton.interactable = currentScene != "SettingsProfileScene";
-        aiButton.interactable = currentScene != "SettingsAIScene";
+        timeButton.interactable = currentScene != "StatisticsTimeScene";
+        pvpButton.interactable = currentScene != "StatisticsPvPScene";
+        pveButton.interactable = currentScene != "StatisticsPvEScene";
         backButton.interactable = true;
     }
 
     private void SetAllButtonsInteractable(bool state)
     {
-        profileButton.interactable = state;
-        aiButton.interactable = state;
+        timeButton.interactable = state;
+        pvpButton.interactable = state;
+        pveButton.interactable = state;
         backButton.interactable = state;
     }
 }

@@ -41,13 +41,9 @@ public class GameManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            SceneManager.sceneLoaded += OnSceneLoaded;
         }
         else Destroy(gameObject);
-    }
-
-    private void OnEnable()
-    {
-        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     private void OnDisable()
@@ -73,6 +69,12 @@ public class GameManager : MonoBehaviour
 
     public void SetGameMode(GameMode mode) => SelectedGameMode = mode;
     public void SetDifficulty(Difficulty diff) => SelectedDifficulty = diff;
+
+    public void EndRound()
+    {
+        gameEnded = true;
+        BlockAllTiles();
+    }
 
     public void SwapNextStarterOnce()
     {
@@ -123,6 +125,7 @@ public class GameManager : MonoBehaviour
 
         gameEnded = false;
         statusUI?.UpdateStatus();
+        StatsManager.Instance.StartRoundTime();
     }
 
     public void RegisterMove(int x, int y, string symbol)
@@ -141,9 +144,8 @@ public class GameManager : MonoBehaviour
 
         if (CheckForWin(x, y, symbol))
         {
-            gameEnded = true;
+            EndRound();
             statusUI.ShowWin(symbol);
-            BlockAllTiles();
 
             if (SelectedGameMode == GameMode.PvE && qLearningAI != null)
             {
@@ -156,9 +158,8 @@ public class GameManager : MonoBehaviour
         }
         else if (IsBoardFull())
         {
-            gameEnded = true;
+            EndRound();
             statusUI.ShowDraw();
-            BlockAllTiles();
 
             const string message = "Draw";
 
@@ -256,6 +257,52 @@ public class GameManager : MonoBehaviour
         return x >= 0 && x < 5 && y >= 0 && y < 5;
     }
 
+    private void UpdateGameStats(string result)
+    {
+        var stats = StatsManager.Instance.Stats;
+
+        if (SelectedGameMode == GameMode.PvP)
+        {
+            stats.pvpGames++;
+            if (result.Contains("X")) stats.pvpXWins++;
+            else if (result.Contains("O")) stats.pvpOWins++;
+            else stats.pvpDraws++;
+        }
+        else if (SelectedGameMode == GameMode.PvE)
+        {
+            bool playerWon = DidPlayerWin(result);
+
+            stats.pveGames++;
+
+            switch (SelectedDifficulty)
+            {
+                case Difficulty.Easy:
+                    stats.pveGamesEasy++;
+                    if (result == "Draw") stats.pveDrawsEasy++;
+                    else if (playerWon) stats.pvePlayerWinsEasy++;
+                    break;
+                case Difficulty.Medium:
+                    stats.pveGamesMedium++;
+                    if (result == "Draw") stats.pveDrawsMedium++;
+                    else if (playerWon) stats.pvePlayerWinsMedium++;
+                    break;
+                case Difficulty.Hard:
+                    stats.pveGamesHard++;
+                    if (result == "Draw") stats.pveDrawsHard++;
+                    else if (playerWon) stats.pvePlayerWinsHard++;
+                    break;
+            }
+        }
+
+        StatsManager.Instance.SaveStats();
+    }
+
+    private bool DidPlayerWin(string result)
+    {
+        string playerSymbol = currentRoundStarter ? "X" : "O";
+        return result.Contains(playerSymbol);
+    }
+
     public void LoadSceneWithDelay(string message, float delay)
     {
         StartCoroutine(LoadSceneCoroutine(message, delay));
@@ -264,7 +311,8 @@ public class GameManager : MonoBehaviour
     private IEnumerator LoadSceneCoroutine(string message, float delay)
     {
         yield return new WaitForSecondsRealtime(delay);
-        gameSceneUIManager?.OpenEndGameScreen(message);
+        UpdateGameStats(message);
+        gameSceneUIManager?.OpenEndGameScreen();
     }
 
     private void ResetBoard()
