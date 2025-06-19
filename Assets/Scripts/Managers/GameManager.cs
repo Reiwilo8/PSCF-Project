@@ -22,10 +22,6 @@ public class GameManager : MonoBehaviour
     public float CustomAlpha { get; set; } = 0.5f;
     public float CustomGamma { get; set; } = 0.9f;
 
-    private float roundActiveTime = 0f;
-    private bool isRoundActive = false;
-    private bool isRoundPaused = false;
-
     public bool IsPlayerOneStarting { get; private set; } = true;
     public bool IsPlayerOneTurn { get; private set; }
 
@@ -45,13 +41,9 @@ public class GameManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            SceneManager.sceneLoaded += OnSceneLoaded;
         }
         else Destroy(gameObject);
-    }
-
-    private void OnEnable()
-    {
-        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     private void OnDisable()
@@ -72,33 +64,17 @@ public class GameManager : MonoBehaviour
             ResetTurnOrder();
             ResetBoard();
             statusUI?.UpdateStatus();
-            StartRound();
         }
-    }
-
-    private void Update()
-    {
-        if (isRoundActive && !isRoundPaused)
-            roundActiveTime += Time.unscaledDeltaTime;
     }
 
     public void SetGameMode(GameMode mode) => SelectedGameMode = mode;
     public void SetDifficulty(Difficulty diff) => SelectedDifficulty = diff;
 
-    public void StartRound()
-    {
-        isRoundActive = true;
-        roundActiveTime = 0f;
-    }
-
     public void EndRound()
     {
-        isRoundActive = false;
-        StatsManager.Instance.Stats.totalTimeInRounds += roundActiveTime;
+        gameEnded = true;
+        BlockAllTiles();
     }
-
-    public void PauseTime() => isRoundPaused = true;
-    public void ResumeTime() => isRoundPaused = false;
 
     public void SwapNextStarterOnce()
     {
@@ -149,6 +125,7 @@ public class GameManager : MonoBehaviour
 
         gameEnded = false;
         statusUI?.UpdateStatus();
+        StatsManager.Instance.StartRoundTime();
     }
 
     public void RegisterMove(int x, int y, string symbol)
@@ -167,9 +144,8 @@ public class GameManager : MonoBehaviour
 
         if (CheckForWin(x, y, symbol))
         {
-            gameEnded = true;
+            EndRound();
             statusUI.ShowWin(symbol);
-            BlockAllTiles();
 
             if (SelectedGameMode == GameMode.PvE && qLearningAI != null)
             {
@@ -182,9 +158,8 @@ public class GameManager : MonoBehaviour
         }
         else if (IsBoardFull())
         {
-            gameEnded = true;
+            EndRound();
             statusUI.ShowDraw();
-            BlockAllTiles();
 
             const string message = "Draw";
 
@@ -284,8 +259,6 @@ public class GameManager : MonoBehaviour
 
     private void UpdateGameStats(string result)
     {
-        EndRound();
-
         var stats = StatsManager.Instance.Stats;
 
         if (SelectedGameMode == GameMode.PvP)
@@ -298,6 +271,8 @@ public class GameManager : MonoBehaviour
         else if (SelectedGameMode == GameMode.PvE)
         {
             bool playerWon = DidPlayerWin(result);
+
+            stats.pveGames++;
 
             switch (SelectedDifficulty)
             {
@@ -337,7 +312,7 @@ public class GameManager : MonoBehaviour
     {
         yield return new WaitForSecondsRealtime(delay);
         UpdateGameStats(message);
-        gameSceneUIManager?.OpenEndGameScreen(message);
+        gameSceneUIManager?.OpenEndGameScreen();
     }
 
     private void ResetBoard()

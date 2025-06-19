@@ -35,6 +35,7 @@ public class StartScreenUI : MonoBehaviour
 
     void OnExitClicked()
     {
+        StatsManager.Instance.SaveStats();
         Application.Quit();
     }
 }

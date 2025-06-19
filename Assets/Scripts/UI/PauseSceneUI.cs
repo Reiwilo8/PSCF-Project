@@ -19,7 +19,7 @@ public class PauseSceneUI : MonoBehaviour
 
     private void OnBackClicked()
     {
-        GameManager.Instance.ResumeTime();
+        StatsManager.Instance.StartRoundTime();
         SceneManager.UnloadSceneAsync("PauseScene");
     }
 

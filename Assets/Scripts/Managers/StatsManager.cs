@@ -8,6 +8,8 @@ public class StatsManager : MonoBehaviour
 
     private string filePath;
 
+    private bool isCountingRoundTime = false;
+
     private void Awake()
     {
         if (Instance == null)
@@ -26,6 +28,11 @@ public class StatsManager : MonoBehaviour
     private void Update()
     {
         Stats.totalTimeInApp += Time.unscaledDeltaTime;
+
+        if (isCountingRoundTime)
+        {
+            Stats.totalTimeInRounds += Time.unscaledDeltaTime;
+        }
     }
 
     public void SaveStats()
@@ -46,5 +53,15 @@ public class StatsManager : MonoBehaviour
     {
         Stats = new GameStats();
         SaveStats();
+    }
+
+    public void StartRoundTime()
+    {
+        isCountingRoundTime = true;
+    }
+
+    public void StopRoundTime()
+    {
+        isCountingRoundTime = false;
     }
 }

@@ -11,6 +11,8 @@ public class GameStats
     public int pvpOWins = 0;
     public int pvpDraws = 0;
 
+    public int pveGames = 0;
+
     public int pveGamesEasy = 0;
     public int pvePlayerWinsEasy = 0;
     public int pveDrawsEasy = 0;
