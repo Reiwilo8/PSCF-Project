@@ -112,36 +112,40 @@ public class QLearningAI : MonoBehaviour
             {
                 if (board[x, y].IsEmpty())
                 {
-                    int index = y * 5 + x;
+                    int index = y * boardSize + x;
                     availableActions.Add(index);
                 }
             }
         }
 
-        if (!qTable.ContainsKey(state))
-        {
-            qTable[state] = new float[25];
-        }
+        EnsureStateExists(state);
+        float[] qValues = qTable[state];
 
         if (UnityEngine.Random.value < epsilon)
         {
             return availableActions[UnityEngine.Random.Range(0, availableActions.Count)];
         }
 
-        float[] qValues = qTable[state];
         float maxQ = float.NegativeInfinity;
-        int bestAction = -1;
+        List<int> bestActions = new List<int>();
 
-        foreach (int a in availableActions)
+        foreach (int action in availableActions)
         {
-            if (qValues[a] > maxQ)
+            float q = qValues[action];
+
+            if (q > maxQ)
             {
-                maxQ = qValues[a];
-                bestAction = a;
+                maxQ = q;
+                bestActions.Clear();
+                bestActions.Add(action);
+            }
+            else if (Mathf.Approximately(q, maxQ))
+            {
+                bestActions.Add(action);
             }
         }
 
-        return bestAction != -1 ? bestAction : availableActions[UnityEngine.Random.Range(0, availableActions.Count)];
+        return bestActions[UnityEngine.Random.Range(0, bestActions.Count)];
     }
 
     public void LearnFromEpisode(string gameResult)
