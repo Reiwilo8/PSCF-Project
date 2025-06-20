@@ -146,30 +146,23 @@ public class QLearningAI : MonoBehaviour
 
     public void LearnFromEpisode(string gameResult)
     {
-        float reward;
+        float finalReward = (gameResult == "Draw") ? 0f :
+                            (gameResult == aiSymbol ? 1f : -1f);
 
-        for (int i = 0; i < episodeHistory.Count; i++)
+        float discountedReward = finalReward;
+
+        for (int i = episodeHistory.Count - 1; i >= 0; i--)
         {
             var (state, action) = episodeHistory[i];
+            UpdateQ(state, action, discountedReward, null);
 
-            if (i == episodeHistory.Count - 1)
-            {
-                reward = (gameResult == "Draw") ? 0f :
-                         (gameResult == aiSymbol ? 1f : -1f);
-
-                UpdateQ(state, action, reward, null);
-            }
-            else
-            {
-                reward = 0f;
-                string nextState = episodeHistory[i + 1].state;
-                UpdateQ(state, action, reward, nextState);
-            }
+            discountedReward *= gamma;
         }
 
         episodeHistory.Clear();
         SaveQTable();
     }
+
 
     public void RecordStep(string state, int action)
     {
