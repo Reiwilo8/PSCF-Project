@@ -173,25 +173,26 @@ public class QLearningAI : MonoBehaviour
     {
         EnsureStateExists(stateKey);
 
-        if (!string.IsNullOrEmpty(nextStateKey))
-        {
-            EnsureStateExists(nextStateKey);
-        }
-
         float[] qValues = qTable[stateKey];
         float qSA = qValues[action];
         float maxQNext = 0f;
 
         if (!string.IsNullOrEmpty(nextStateKey))
         {
+            EnsureStateExists(nextStateKey);
             float[] qNext = qTable[nextStateKey];
-            float maxVal = float.MinValue;
+            maxQNext = float.MinValue;
+
             foreach (float v in qNext)
-                if (v > maxVal) maxVal = v;
-            maxQNext = maxVal;
+            {
+                if (v > maxQNext)
+                    maxQNext = v;
+            }
+
+            if (maxQNext == float.MinValue)
+                maxQNext = 0f;
         }
 
         qValues[action] = qSA + alpha * (reward + gamma * maxQNext - qSA);
-        qTable[stateKey] = qValues;
     }
 }
