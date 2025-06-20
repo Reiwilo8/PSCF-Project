@@ -19,13 +19,39 @@ public class QLearningAI : MonoBehaviour
         qTable = QTableIO.Load();
     }
 
+    private float[] GetHeuristicQValues()
+    {
+        float[] heuristic = new float[boardSize * boardSize];
+
+        for (int y = 0; y < boardSize; y++)
+        {
+            for (int x = 0; x < boardSize; x++)
+            {
+                int index = y * boardSize + x;
+
+                bool isCenter = x == boardSize / 2 && y == boardSize / 2;
+                bool isCorner = (x == 0 || x == boardSize - 1) && (y == 0 || y == boardSize - 1);
+                bool isEdgeCenter = (x == boardSize / 2 || y == boardSize / 2);
+
+                if (isCenter)
+                    heuristic[index] = 0.4f;
+                else if (isEdgeCenter)
+                    heuristic[index] = 0.2f;
+                else if (isCorner)
+                    heuristic[index] = 0.1f;
+                else
+                    heuristic[index] = 0.0f;
+            }
+        }
+
+        return heuristic;
+    }
+
     private void EnsureStateExists(string stateKey)
     {
         if (!qTable.ContainsKey(stateKey))
         {
-            qTable[stateKey] = new float[boardSize * boardSize];
-            for (int i = 0; i < boardSize * boardSize; i++)
-                qTable[stateKey][i] = 0f;
+            qTable[stateKey] = GetHeuristicQValues();
         }
     }
 
