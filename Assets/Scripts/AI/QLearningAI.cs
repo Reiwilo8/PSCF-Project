@@ -19,13 +19,39 @@ public class QLearningAI : MonoBehaviour
         qTable = QTableIO.Load();
     }
 
+    private float[] GetHeuristicQValues()
+    {
+        float[] heuristic = new float[boardSize * boardSize];
+
+        for (int y = 0; y < boardSize; y++)
+        {
+            for (int x = 0; x < boardSize; x++)
+            {
+                int index = y * boardSize + x;
+
+                bool isCenter = x == boardSize / 2 && y == boardSize / 2;
+                bool isCorner = (x == 0 || x == boardSize - 1) && (y == 0 || y == boardSize - 1);
+                bool isEdgeCenter = (x == boardSize / 2 || y == boardSize / 2);
+
+                if (isCenter)
+                    heuristic[index] = 0.4f;
+                else if (isEdgeCenter)
+                    heuristic[index] = 0.2f;
+                else if (isCorner)
+                    heuristic[index] = 0.1f;
+                else
+                    heuristic[index] = 0.0f;
+            }
+        }
+
+        return heuristic;
+    }
+
     private void EnsureStateExists(string stateKey)
     {
         if (!qTable.ContainsKey(stateKey))
         {
-            qTable[stateKey] = new float[boardSize * boardSize];
-            for (int i = 0; i < boardSize * boardSize; i++)
-                qTable[stateKey][i] = 0f;
+            qTable[stateKey] = GetHeuristicQValues();
         }
     }
 
@@ -112,64 +138,61 @@ public class QLearningAI : MonoBehaviour
             {
                 if (board[x, y].IsEmpty())
                 {
-                    int index = y * 5 + x;
+                    int index = y * boardSize + x;
                     availableActions.Add(index);
                 }
             }
         }
 
-        if (!qTable.ContainsKey(state))
-        {
-            qTable[state] = new float[25];
-        }
+        EnsureStateExists(state);
+        float[] qValues = qTable[state];
 
         if (UnityEngine.Random.value < epsilon)
         {
             return availableActions[UnityEngine.Random.Range(0, availableActions.Count)];
         }
 
-        float[] qValues = qTable[state];
         float maxQ = float.NegativeInfinity;
-        int bestAction = -1;
+        List<int> bestActions = new List<int>();
 
-        foreach (int a in availableActions)
+        foreach (int action in availableActions)
         {
-            if (qValues[a] > maxQ)
+            float q = qValues[action];
+
+            if (q > maxQ)
             {
-                maxQ = qValues[a];
-                bestAction = a;
+                maxQ = q;
+                bestActions.Clear();
+                bestActions.Add(action);
+            }
+            else if (Mathf.Approximately(q, maxQ))
+            {
+                bestActions.Add(action);
             }
         }
 
-        return bestAction != -1 ? bestAction : availableActions[UnityEngine.Random.Range(0, availableActions.Count)];
+        return bestActions[UnityEngine.Random.Range(0, bestActions.Count)];
     }
 
     public void LearnFromEpisode(string gameResult)
     {
-        float reward;
+        float finalReward = (gameResult == "Draw") ? 0f :
+                            (gameResult == aiSymbol ? 1f : -1f);
 
-        for (int i = 0; i < episodeHistory.Count; i++)
+        float discountedReward = finalReward;
+
+        for (int i = episodeHistory.Count - 1; i >= 0; i--)
         {
             var (state, action) = episodeHistory[i];
+            UpdateQ(state, action, discountedReward, null);
 
-            if (i == episodeHistory.Count - 1)
-            {
-                reward = (gameResult == "Draw") ? 0f :
-                         (gameResult == aiSymbol ? 1f : -1f);
-
-                UpdateQ(state, action, reward, null);
-            }
-            else
-            {
-                reward = 0f;
-                string nextState = episodeHistory[i + 1].state;
-                UpdateQ(state, action, reward, nextState);
-            }
+            discountedReward *= gamma;
         }
 
         episodeHistory.Clear();
         SaveQTable();
     }
+
 
     public void RecordStep(string state, int action)
     {
@@ -180,25 +203,26 @@ public class QLearningAI : MonoBehaviour
     {
         EnsureStateExists(stateKey);
 
-        if (!string.IsNullOrEmpty(nextStateKey))
-        {
-            EnsureStateExists(nextStateKey);
-        }
-
         float[] qValues = qTable[stateKey];
         float qSA = qValues[action];
         float maxQNext = 0f;
 
         if (!string.IsNullOrEmpty(nextStateKey))
         {
+            EnsureStateExists(nextStateKey);
             float[] qNext = qTable[nextStateKey];
-            float maxVal = float.MinValue;
+            maxQNext = float.MinValue;
+
             foreach (float v in qNext)
-                if (v > maxVal) maxVal = v;
-            maxQNext = maxVal;
+            {
+                if (v > maxQNext)
+                    maxQNext = v;
+            }
+
+            if (maxQNext == float.MinValue)
+                maxQNext = 0f;
         }
 
         qValues[action] = qSA + alpha * (reward + gamma * maxQNext - qSA);
-        qTable[stateKey] = qValues;
     }
 }
