@@ -1802,6 +1802,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   totalPvEGamesLabel: {fileID: 1617255654}
+  easyLabel: {fileID: 1659845377}
+  mediumLabel: {fileID: 118480022}
+  hardLabel: {fileID: 1322322772}
+  gamesRowLabel: {fileID: 709090614}
+  winsRowLabel: {fileID: 1887303645}
+  drawsRowLabel: {fileID: 1783178150}
   totalEasyGamesLabel: {fileID: 498960102}
   totalEasyWinsLabel: {fileID: 865606019}
   totalEasyDrawsLabel: {fileID: 1761911908}
