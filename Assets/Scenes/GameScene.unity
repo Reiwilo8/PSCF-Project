@@ -335,12 +335,16 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 171699224416576020, guid: 729820d0a8a380943a87817b52e05d47, type: 3}
+      propertyPath: m_Pivot.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 171699224416576020, guid: 729820d0a8a380943a87817b52e05d47, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0.9
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 171699224416576020, guid: 729820d0a8a380943a87817b52e05d47, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0.9
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 171699224416576020, guid: 729820d0a8a380943a87817b52e05d47, type: 3}
       propertyPath: m_SizeDelta.y
@@ -348,7 +352,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 171699224416576020, guid: 729820d0a8a380943a87817b52e05d47, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -54
       objectReference: {fileID: 0}
     - target: {fileID: 509581343092336600, guid: 729820d0a8a380943a87817b52e05d47, type: 3}
       propertyPath: m_AnchorMax.y
