@@ -25,7 +25,7 @@ public class GameManager : MonoBehaviour
     public bool IsPlayerOneStarting { get; private set; } = true;
     public bool IsPlayerOneTurn { get; private set; }
 
-    public Tile[,] board = new Tile[5, 5];
+    public Tile[,] board = new Tile[GridSize, GridSize];
     private Vector2Int winStart, winEnd;
 
     private bool swapNextStart = false;
@@ -35,6 +35,12 @@ public class GameManager : MonoBehaviour
 
     private bool gameEnded = false;
 
+    private const int GridSize = 5;
+    public int GetGridSize() => GridSize;
+
+    /// <summary>
+    /// Ensures singleton instance and registers scene load callback.
+    /// </summary>
     private void Awake()
     {
         if (Instance == null)
@@ -46,11 +52,17 @@ public class GameManager : MonoBehaviour
         else Destroy(gameObject);
     }
 
+    /// <summary>
+    /// Unsubscribes from scene load callback.
+    /// </summary>
     private void OnDisable()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
+    /// <summary>
+    /// Initializes references and game state when the game scene loads.
+    /// </summary>
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         if (scene.name == "GameScene")
@@ -67,32 +79,52 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Sets the current game mode.
+    /// </summary>
     public void SetGameMode(GameMode mode) => SelectedGameMode = mode;
+
+    /// <summary>
+    /// Sets the current AI difficulty.
+    /// </summary>
     public void SetDifficulty(Difficulty diff) => SelectedDifficulty = diff;
 
+    /// <summary>
+    /// Ends the round and disables all tile interaction.
+    /// </summary>
     public void EndRound()
     {
         gameEnded = true;
         BlockAllTiles();
     }
 
-    public void SwapNextStarterOnce()
-    {
-        swapNextStart = true;
-    }
+    /// <summary>
+    /// Flags that the starter should be swapped for the next round only.
+    /// </summary>
+    public void SwapNextStarterOnce() => swapNextStart = true;
 
-    public void RestartWithCurrentStarter()
+    /// <summary>
+    /// Forces the current round starter to start the next round.
+    /// </summary>
+    public void RestartWithCurrentStarter() => SetStarterOverride(currentRoundStarter);
+
+    /// <summary>
+    /// Forces the next round to be started by the other player.
+    /// </summary>
+    public void RestartWithSwappedStarter() => SetStarterOverride(!currentRoundStarter);
+
+    /// <summary>
+    /// Sets starter override for the next round.
+    /// </summary>
+    private void SetStarterOverride(bool value)
     {
         overrideStarterNextGame = true;
-        overrideStarterValue = currentRoundStarter;
+        overrideStarterValue = value;
     }
 
-    public void RestartWithSwappedStarter()
-    {
-        overrideStarterNextGame = true;
-        overrideStarterValue = !currentRoundStarter;
-    }
-
+    /// <summary>
+    /// Initializes the turn order and triggers AI move if needed.
+    /// </summary>
     public void ResetTurnOrder()
     {
         if (overrideStarterNextGame)
@@ -128,47 +160,35 @@ public class GameManager : MonoBehaviour
         StatsManager.Instance.StartRoundTime();
     }
 
+    /// <summary>
+    /// Registers a player or AI move, checks for win or draw, and handles transition.
+    /// </summary>
     public void RegisterMove(int x, int y, string symbol)
     {
-        if (gameEnded) return;
-        if (board[x, y].IsOccupied) return;
+        if (gameEnded || board[x, y].IsOccupied) return;
 
         board[x, y].SetSymbol(symbol);
 
         if (SelectedGameMode == GameMode.PvE && qLearningAI != null && !gameEnded)
         {
             string state = qLearningAI.BuildStateString(board);
-            int action = y * 5 + x;
+            int action = y * GridSize + x;
             qLearningAI.RecordStep(state, action);
         }
 
         if (CheckForWin(x, y, symbol))
         {
             EndRound();
-            statusUI.ShowWin(symbol);
-
-            if (SelectedGameMode == GameMode.PvE && qLearningAI != null)
-            {
-                qLearningAI.LearnFromEpisode(symbol);
-            }
-
-            string message = $"{symbol} Wins";
-
-            LoadSceneWithDelay(message, 1f);
+            statusUI?.ShowWin(symbol);
+            qLearningAI?.LearnFromEpisode(symbol);
+            LoadSceneWithDelay($"{symbol} Wins", 1f);
         }
         else if (IsBoardFull())
         {
             EndRound();
-            statusUI.ShowDraw();
-
-            const string message = "Draw";
-
-            if (SelectedGameMode == GameMode.PvE && qLearningAI != null)
-            {
-                qLearningAI.LearnFromEpisode(message);
-            }
-
-            LoadSceneWithDelay(message, 1f);
+            statusUI?.ShowDraw();
+            qLearningAI?.LearnFromEpisode("Draw");
+            LoadSceneWithDelay("Draw", 1f);
         }
         else
         {
@@ -176,6 +196,9 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Switches to the next player's turn and triggers AI if needed.
+    /// </summary>
     private void SwitchTurn()
     {
         IsPlayerOneTurn = !IsPlayerOneTurn;
@@ -187,6 +210,9 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Returns true if all tiles are occupied.
+    /// </summary>
     private bool IsBoardFull()
     {
         foreach (var t in board)
@@ -194,26 +220,33 @@ public class GameManager : MonoBehaviour
         return true;
     }
 
+    /// <summary>
+    /// Waits briefly before executing AI's move.
+    /// </summary>
     private IEnumerator DelayedAIMove()
     {
         yield return new WaitForSecondsRealtime(0.5f);
         MakeAiMove();
     }
 
+    /// <summary>
+    /// Requests the next move from the AI and registers it.
+    /// </summary>
     private void MakeAiMove()
     {
         if (qLearningAI == null) return;
 
         int actionIndex = qLearningAI.GetNextMove(board, IsPlayerOneTurn);
-
-        int ax = actionIndex % 5;
-        int ay = actionIndex / 5;
-
+        int ax = actionIndex % GridSize;
+        int ay = actionIndex / GridSize;
         string aiSymbol = IsPlayerOneTurn ? "X" : "O";
 
         RegisterMove(ax, ay, aiSymbol);
     }
 
+    /// <summary>
+    /// Checks in all directions for a four-in-a-row win from the given tile.
+    /// </summary>
     private bool CheckForWin(int sx, int sy, string sym)
     {
         Vector2Int[] dirs = {
@@ -230,13 +263,14 @@ public class GameManager : MonoBehaviour
             Vector2Int start = new Vector2Int(sx, sy);
             Vector2Int end = new Vector2Int(sx, sy);
 
-            while (InBounds(x, y) && board[x, y].symbolText.text == sym)
+            while (InBounds(x, y) && board[x, y].symbolText != null && board[x, y].symbolText.text == sym)
             {
                 end = new Vector2Int(x, y);
                 count++; x += d.x; y += d.y;
             }
+
             x = sx - d.x; y = sy - d.y;
-            while (InBounds(x, y) && board[x, y].symbolText.text == sym)
+            while (InBounds(x, y) && board[x, y].symbolText != null && board[x, y].symbolText.text == sym)
             {
                 start = new Vector2Int(x, y);
                 count++; x -= d.x; y -= d.y;
@@ -252,11 +286,17 @@ public class GameManager : MonoBehaviour
         return false;
     }
 
+    /// <summary>
+    /// Returns true if the given position is within the grid bounds.
+    /// </summary>
     private bool InBounds(int x, int y)
     {
-        return x >= 0 && x < 5 && y >= 0 && y < 5;
+        return x >= 0 && x < GridSize && y >= 0 && y < GridSize;
     }
 
+    /// <summary>
+    /// Updates win/loss/draw stats based on result.
+    /// </summary>
     private void UpdateGameStats(string result)
     {
         var stats = StatsManager.Instance.Stats;
@@ -271,7 +311,6 @@ public class GameManager : MonoBehaviour
         else if (SelectedGameMode == GameMode.PvE)
         {
             bool playerWon = DidPlayerWin(result);
-
             stats.pveGames++;
 
             switch (SelectedDifficulty)
@@ -297,17 +336,26 @@ public class GameManager : MonoBehaviour
         StatsManager.Instance.SaveStats();
     }
 
+    /// <summary>
+    /// Determines if the human player won based on the result.
+    /// </summary>
     private bool DidPlayerWin(string result)
     {
         string playerSymbol = currentRoundStarter ? "X" : "O";
         return result.Contains(playerSymbol);
     }
 
+    /// <summary>
+    /// Triggers a delayed scene load with end-of-game message.
+    /// </summary>
     public void LoadSceneWithDelay(string message, float delay)
     {
         StartCoroutine(LoadSceneCoroutine(message, delay));
     }
 
+    /// <summary>
+    /// Waits, updates stats, and opens the end game screen.
+    /// </summary>
     private IEnumerator LoadSceneCoroutine(string message, float delay)
     {
         yield return new WaitForSecondsRealtime(delay);
@@ -315,20 +363,29 @@ public class GameManager : MonoBehaviour
         gameSceneUIManager?.OpenEndGameScreen();
     }
 
+    /// <summary>
+    /// Resets and reinitializes all tiles on the board.
+    /// </summary>
     private void ResetBoard()
     {
-        for (int x = 0; x < 5; x++)
-            for (int y = 0; y < 5; y++)
+        for (int x = 0; x < GridSize; x++)
+            for (int y = 0; y < GridSize; y++)
                 board[x, y].Init(x, y);
     }
 
+    /// <summary>
+    /// Disables interaction with all board tiles.
+    /// </summary>
     private void BlockAllTiles()
     {
-        for (int x = 0; x < 5; x++)
-            for (int y = 0; y < 5; y++)
+        for (int x = 0; x < GridSize; x++)
+            for (int y = 0; y < GridSize; y++)
                 board[x, y].button.interactable = false;
     }
 
+    /// <summary>
+    /// Resets all round-related state flags and stops running coroutines.
+    /// </summary>
     public void ResetAllFlags()
     {
         swapNextStart = false;

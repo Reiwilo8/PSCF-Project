@@ -8,8 +8,8 @@ using System.Collections;
 public class GridLinesDrawer : MonoBehaviour
 {
     // Grid dimensions
-    [SerializeField] private int rows = 5;
-    [SerializeField] private int cols = 5;
+    private int rows;
+    private int cols;
 
     // Line appearance
     [SerializeField] private float thickness = 10f;
@@ -24,6 +24,9 @@ public class GridLinesDrawer : MonoBehaviour
     /// </summary>
     private void Start()
     {
+        int gridSize = GameManager.Instance != null ? GameManager.Instance.GetGridSize() : 5;
+        rows = cols = gridSize;
+
         StartCoroutine(DrawLinesDelayed());
     }
 
