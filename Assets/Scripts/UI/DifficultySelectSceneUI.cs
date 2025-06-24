@@ -7,12 +7,17 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public class DifficultySelectUI : MonoBehaviour
 {
-    // Button references assigned via Inspector
+    // UI button references (assigned via Inspector)
     public Button backButton;
     public Button easyButton;
     public Button mediumButton;
     public Button hardButton;
     public Button customButton;
+
+    // Scene name constants
+    private const string GameModeSceneName = "GameModeScene";
+    private const string GameSceneName = "GameScene";
+    private const string CustomSettingsSceneName = "CustomDifficultySettingsScene";
 
     /// <summary>
     /// Initializes button listeners on startup.
@@ -40,7 +45,7 @@ public class DifficultySelectUI : MonoBehaviour
     /// </summary>
     private void OnBackClicked()
     {
-        SceneManager.LoadScene("GameModeScene");
+        SceneManager.LoadScene(GameModeSceneName);
     }
 
     /// <summary>
@@ -52,10 +57,10 @@ public class DifficultySelectUI : MonoBehaviour
         GameManager.Instance.SetGameMode(GameMode.PvE);
         GameManager.Instance.SetDifficulty(difficulty);
 
-        string sceneName = (difficulty == Difficulty.Custom)
-            ? "CustomDifficultySettingsScene"
-            : "GameScene";
+        string sceneToLoad = (difficulty == Difficulty.Custom)
+            ? CustomSettingsSceneName
+            : GameSceneName;
 
-        SceneManager.LoadScene(sceneName);
+        SceneManager.LoadScene(sceneToLoad);
     }
 }

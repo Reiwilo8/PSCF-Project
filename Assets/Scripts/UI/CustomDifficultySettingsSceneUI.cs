@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public class CustomDifficultySettingsSceneUI : MonoBehaviour
 {
-    // UI references for buttons
+    // UI references for buttons (assigned in the Inspector)
     public Button backButton;
     public Button playButton;
 
@@ -17,8 +17,12 @@ public class CustomDifficultySettingsSceneUI : MonoBehaviour
     public Slider gammaSlider;   // Discount factor (intelligence)
     public Slider epsilonSlider; // Randomness (exploration)
 
+    // Scene name constants
+    private const string DifficultySelectSceneName = "DifficultySelectScene";
+    private const string GameSceneName = "GameScene";
+
     /// <summary>
-    /// Initializes button listeners on scene start.
+    /// Initializes button click listeners on scene start.
     /// </summary>
     private void Start()
     {
@@ -31,7 +35,7 @@ public class CustomDifficultySettingsSceneUI : MonoBehaviour
     /// </summary>
     private void OnBackClicked()
     {
-        SceneManager.LoadScene("DifficultySelectScene");
+        SceneManager.LoadScene(DifficultySelectSceneName);
     }
 
     /// <summary>
@@ -39,11 +43,11 @@ public class CustomDifficultySettingsSceneUI : MonoBehaviour
     /// </summary>
     private void OnPlayClicked()
     {
-        // Ensure values are within valid range [0, 1]
+        // Ensure values are clamped within valid range [0, 1]
         GameManager.Instance.CustomAlpha = Mathf.Clamp01(alphaSlider.value);
         GameManager.Instance.CustomGamma = Mathf.Clamp01(gammaSlider.value);
         GameManager.Instance.CustomEpsilon = Mathf.Clamp01(epsilonSlider.value);
 
-        SceneManager.LoadScene("GameScene");
+        SceneManager.LoadScene(GameSceneName);
     }
 }
