@@ -101,7 +101,7 @@ public class SettingsSceneUI : MonoBehaviour
         var scene = SceneManager.GetSceneByName(sceneName);
         if (scene.isLoaded)
         {
-            SceneManager.UnloadSceneAsync(scene);
+            SceneManager.UnloadSceneAsync(scene.name);
         }
     }
 
