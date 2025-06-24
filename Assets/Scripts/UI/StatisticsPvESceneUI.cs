@@ -2,6 +2,9 @@ using UnityEngine;
 using TMPro;
 using System.Collections;
 
+/// <summary>
+/// Displays PvE game statistics by difficulty and adjusts layout font sizes uniformly.
+/// </summary>
 public class StatisticsPvESceneUI : MonoBehaviour
 {
     [SerializeField] private TMP_Text totalPvEGamesLabel;
@@ -31,23 +34,36 @@ public class StatisticsPvESceneUI : MonoBehaviour
     [SerializeField] private TMP_Text totalHardWinsLabel;
     [SerializeField] private TMP_Text totalHardDrawsLabel;
 
+    /// <summary>
+    /// Initializes PvE statistic values and synchronizes font sizes for grid labels.
+    /// </summary>
     private void Start()
     {
         var stats = StatsManager.Instance.Stats;
 
-        totalPvEGamesLabel.text = stats.pveGames.ToString();
+        if (totalPvEGamesLabel != null)
+            totalPvEGamesLabel.text = stats.pveGames.ToString();
 
-        totalEasyGamesLabel.text = stats.pveGamesEasy.ToString();
-        totalEasyWinsLabel.text = stats.pvePlayerWinsEasy.ToString();
-        totalEasyDrawsLabel.text = stats.pveDrawsEasy.ToString();
+        if (totalEasyGamesLabel != null)
+            totalEasyGamesLabel.text = stats.pveGamesEasy.ToString();
+        if (totalEasyWinsLabel != null)
+            totalEasyWinsLabel.text = stats.pvePlayerWinsEasy.ToString();
+        if (totalEasyDrawsLabel != null)
+            totalEasyDrawsLabel.text = stats.pveDrawsEasy.ToString();
 
-        totalMediumGamesLabel.text = stats.pveGamesMedium.ToString();
-        totalMediumWinsLabel.text = stats.pvePlayerWinsMedium.ToString();
-        totalMediumDrawsLabel.text = stats.pveDrawsMedium.ToString();
+        if (totalMediumGamesLabel != null)
+            totalMediumGamesLabel.text = stats.pveGamesMedium.ToString();
+        if (totalMediumWinsLabel != null)
+            totalMediumWinsLabel.text = stats.pvePlayerWinsMedium.ToString();
+        if (totalMediumDrawsLabel != null)
+            totalMediumDrawsLabel.text = stats.pveDrawsMedium.ToString();
 
-        totalHardGamesLabel.text = stats.pveGamesHard.ToString();
-        totalHardWinsLabel.text = stats.pvePlayerWinsHard.ToString();
-        totalHardDrawsLabel.text = stats.pveDrawsHard.ToString();
+        if (totalHardGamesLabel != null)
+            totalHardGamesLabel.text = stats.pveGamesHard.ToString();
+        if (totalHardWinsLabel != null)
+            totalHardWinsLabel.text = stats.pvePlayerWinsHard.ToString();
+        if (totalHardDrawsLabel != null)
+            totalHardDrawsLabel.text = stats.pveDrawsHard.ToString();
 
         TMP_Text[] gridTexts = new TMP_Text[]
         {
@@ -62,22 +78,29 @@ public class StatisticsPvESceneUI : MonoBehaviour
         StartCoroutine(SyncFontSize(gridTexts));
     }
 
+    /// <summary>
+    /// Normalizes font size across a group of TMP_Text elements by setting all to the smallest auto-sized font.
+    /// </summary>
+    /// <param name="texts">Array of text elements to process.</param>
     private IEnumerator SyncFontSize(TMP_Text[] texts)
     {
-        yield return null;
+        yield return null; // Wait for TMP auto-sizing to apply
 
         float smallestSize = float.MaxValue;
 
         foreach (var text in texts)
         {
-            if (text.enableAutoSizing)
+            if (text != null && text.enableAutoSizing)
                 smallestSize = Mathf.Min(smallestSize, text.fontSize);
         }
 
         foreach (var text in texts)
         {
-            text.enableAutoSizing = false;
-            text.fontSize = smallestSize;
+            if (text != null)
+            {
+                text.enableAutoSizing = false;
+                text.fontSize = smallestSize;
+            }
         }
     }
 }
