@@ -8,7 +8,7 @@ using UnityEngine.UI;
 public class Tile : MonoBehaviour
 {
     // Tile position in the board grid
-    public Vector2Int coordinates;
+    private Vector2Int coordinates;
 
     // Assigned via prefab
     public Button button;

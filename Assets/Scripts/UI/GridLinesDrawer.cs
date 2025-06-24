@@ -8,12 +8,12 @@ using System.Collections;
 public class GridLinesDrawer : MonoBehaviour
 {
     // Grid dimensions
-    public int rows = 5;
-    public int cols = 5;
+    [SerializeField] private int rows = 5;
+    [SerializeField] private int cols = 5;
 
     // Line appearance
-    public float thickness = 10f;
-    public Color lineColor = Color.black;
+    [SerializeField] private float thickness = 10f;
+    [SerializeField] private Color lineColor = Color.black;
 
     // Assigned references
     public RectTransform boardArea;

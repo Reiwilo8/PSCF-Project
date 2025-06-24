@@ -9,8 +9,8 @@ public class BoardManager : MonoBehaviour
     public GameObject tilePrefab;
 
     // Board dimensions
-    public int rows = 5;
-    public int cols = 5;
+    [SerializeField] private int rows = 5;
+    [SerializeField] private int cols = 5;
 
     /// <summary>
     /// Generates the tile grid on scene start.
