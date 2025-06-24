@@ -45,7 +45,7 @@ public class StartScreenUI : MonoBehaviour
     }
 
     /// <summary>
-    /// Loads the statistics screen scene.
+    /// Loads the statistics scene.
     /// </summary>
     void OnStatisticsClicked()
     {
@@ -53,7 +53,7 @@ public class StartScreenUI : MonoBehaviour
     }
 
     /// <summary>
-    /// Loads the settings screen scene.
+    /// Loads the settings scene.
     /// </summary>
     void OnSettingsClicked()
     {
