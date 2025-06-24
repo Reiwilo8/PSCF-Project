@@ -5,41 +5,53 @@ using UnityEngine.SceneManagement;
 public enum GameMode { PvP, PvE }
 public enum Difficulty { Easy, Medium, Hard, Custom }
 
+/// <summary>
+/// Central controller for game state, flow, UI coordination, player turn handling,
+/// win logic, and AI integration in both PvP and PvE modes.
+/// </summary>
 public class GameManager : MonoBehaviour
 {
+    // Singleton instance
     public static GameManager Instance;
 
+    // UI references (assigned via scene lookup)
     public GameSceneUI gameSceneUIManager;
     public GameStatusUI statusUI;
     public WinLineDrawer winLineDrawer;
 
+    // AI logic handler (used in PvE mode)
     public QLearningAI qLearningAI;
 
+    // Game configuration
     public GameMode SelectedGameMode { get; set; }
     public Difficulty SelectedDifficulty { get; set; }
 
+    // Custom difficulty parameters (used only if Difficulty.Custom is selected)
     public float CustomEpsilon { get; set; } = 0.1f;
     public float CustomAlpha { get; set; } = 0.5f;
     public float CustomGamma { get; set; } = 0.9f;
 
+    // Player state
     public bool IsPlayerOneStarting { get; private set; } = true;
     public bool IsPlayerOneTurn { get; private set; }
 
+    // Game board reference
     public Tile[,] board = new Tile[GridSize, GridSize];
-    private Vector2Int winStart, winEnd;
 
+    // Internal state tracking
+    private Vector2Int winStart, winEnd;
     private bool swapNextStart = false;
     private bool currentRoundStarter = true;
     private bool overrideStarterNextGame = false;
     private bool overrideStarterValue = true;
-
     private bool gameEnded = false;
 
+    // Grid size for consistent board dimensions
     private const int GridSize = 5;
     public int GetGridSize() => GridSize;
 
     /// <summary>
-    /// Ensures singleton instance and registers scene load callback.
+    /// Initializes the singleton and registers scene load event.
     /// </summary>
     private void Awake()
     {
@@ -53,7 +65,7 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Unsubscribes from scene load callback.
+    /// Ensures proper cleanup by unregistering scene events.
     /// </summary>
     private void OnDisable()
     {
@@ -61,7 +73,7 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Initializes references and game state when the game scene loads.
+    /// Called when a new scene is loaded. Initializes references and resets state if entering game scene.
     /// </summary>
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
@@ -80,17 +92,17 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Sets the current game mode.
+    /// Sets the current game mode (PvP or PvE).
     /// </summary>
     public void SetGameMode(GameMode mode) => SelectedGameMode = mode;
 
     /// <summary>
-    /// Sets the current AI difficulty.
+    /// Sets the selected difficulty (used only in PvE).
     /// </summary>
     public void SetDifficulty(Difficulty diff) => SelectedDifficulty = diff;
 
     /// <summary>
-    /// Ends the round and disables all tile interaction.
+    /// Ends the current round and disables further tile interaction.
     /// </summary>
     public void EndRound()
     {
@@ -99,22 +111,22 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Flags that the starter should be swapped for the next round only.
+    /// Swaps the starter player for the next round only.
     /// </summary>
     public void SwapNextStarterOnce() => swapNextStart = true;
 
     /// <summary>
-    /// Forces the current round starter to start the next round.
+    /// Forces the next round to start with the same player as the current round.
     /// </summary>
     public void RestartWithCurrentStarter() => SetStarterOverride(currentRoundStarter);
 
     /// <summary>
-    /// Forces the next round to be started by the other player.
+    /// Forces the next round to start with the opposite player.
     /// </summary>
     public void RestartWithSwappedStarter() => SetStarterOverride(!currentRoundStarter);
 
     /// <summary>
-    /// Sets starter override for the next round.
+    /// Internally flags the starter override and its value.
     /// </summary>
     private void SetStarterOverride(bool value)
     {
@@ -123,7 +135,7 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Initializes the turn order and triggers AI move if needed.
+    /// Resets turn order, configures AI if needed, and starts the round timer.
     /// </summary>
     public void ResetTurnOrder()
     {
@@ -161,7 +173,8 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Registers a player or AI move, checks for win or draw, and handles transition.
+    /// Handles a move being made on the board, by player or AI.
+    /// Checks for win/draw conditions and manages state progression.
     /// </summary>
     public void RegisterMove(int x, int y, string symbol)
     {
@@ -197,7 +210,7 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Switches to the next player's turn and triggers AI if needed.
+    /// Switches turn to the next player and triggers AI if applicable.
     /// </summary>
     private void SwitchTurn()
     {
@@ -211,17 +224,20 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Returns true if all tiles are occupied.
+    /// Checks whether the board is completely filled.
     /// </summary>
     private bool IsBoardFull()
     {
-        foreach (var t in board)
-            if (!t.IsOccupied) return false;
+        foreach (var tile in board)
+        {
+            if (!tile.IsOccupied)
+                return false;
+        }
         return true;
     }
 
     /// <summary>
-    /// Waits briefly before executing AI's move.
+    /// Delays AI move slightly to simulate thinking and allow UI update.
     /// </summary>
     private IEnumerator DelayedAIMove()
     {
@@ -230,50 +246,59 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Requests the next move from the AI and registers it.
+    /// Retrieves the next move from AI and registers it as a board move.
     /// </summary>
     private void MakeAiMove()
     {
         if (qLearningAI == null) return;
 
         int actionIndex = qLearningAI.GetNextMove(board, IsPlayerOneTurn);
-        int ax = actionIndex % GridSize;
-        int ay = actionIndex / GridSize;
-        string aiSymbol = IsPlayerOneTurn ? "X" : "O";
+        int x = actionIndex % GridSize;
+        int y = actionIndex / GridSize;
+        string symbol = IsPlayerOneTurn ? "X" : "O";
 
-        RegisterMove(ax, ay, aiSymbol);
+        RegisterMove(x, y, symbol);
     }
 
     /// <summary>
-    /// Checks in all directions for a four-in-a-row win from the given tile.
+    /// Checks in all four directions (horizontal, vertical, diagonals)
+    /// to determine if the current move completes a winning sequence.
     /// </summary>
-    private bool CheckForWin(int sx, int sy, string sym)
+    private bool CheckForWin(int sx, int sy, string symbol)
     {
-        Vector2Int[] dirs = {
-            new Vector2Int(1, 0),
-            new Vector2Int(0, 1),
-            new Vector2Int(1, 1),
-            new Vector2Int(1, -1)
+        Vector2Int[] directions = new Vector2Int[]
+        {
+            new Vector2Int(1, 0),   // Horizontal
+            new Vector2Int(0, 1),   // Vertical
+            new Vector2Int(1, 1),   // Diagonal down-right
+            new Vector2Int(1, -1)   // Diagonal up-right
         };
 
-        foreach (var d in dirs)
+        foreach (var dir in directions)
         {
             int count = 1;
-            int x = sx + d.x, y = sy + d.y;
+            int x = sx + dir.x, y = sy + dir.y;
             Vector2Int start = new Vector2Int(sx, sy);
             Vector2Int end = new Vector2Int(sx, sy);
 
-            while (InBounds(x, y) && board[x, y].symbolText != null && board[x, y].symbolText.text == sym)
+            // Check forward direction
+            while (InBounds(x, y) && board[x, y].symbolText != null && board[x, y].symbolText.text == symbol)
             {
                 end = new Vector2Int(x, y);
-                count++; x += d.x; y += d.y;
+                count++;
+                x += dir.x;
+                y += dir.y;
             }
 
-            x = sx - d.x; y = sy - d.y;
-            while (InBounds(x, y) && board[x, y].symbolText != null && board[x, y].symbolText.text == sym)
+            // Check backward direction
+            x = sx - dir.x;
+            y = sy - dir.y;
+            while (InBounds(x, y) && board[x, y].symbolText != null && board[x, y].symbolText.text == symbol)
             {
                 start = new Vector2Int(x, y);
-                count++; x -= d.x; y -= d.y;
+                count++;
+                x -= dir.x;
+                y -= dir.y;
             }
 
             if (count >= 4)
@@ -287,7 +312,7 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Returns true if the given position is within the grid bounds.
+    /// Returns true if (x, y) is inside the bounds of the grid.
     /// </summary>
     private bool InBounds(int x, int y)
     {
@@ -295,7 +320,7 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Updates win/loss/draw stats based on result.
+    /// Updates session statistics based on the final game result.
     /// </summary>
     private void UpdateGameStats(string result)
     {
@@ -304,6 +329,7 @@ public class GameManager : MonoBehaviour
         if (SelectedGameMode == GameMode.PvP)
         {
             stats.pvpGames++;
+
             if (result.Contains("X")) stats.pvpXWins++;
             else if (result.Contains("O")) stats.pvpOWins++;
             else stats.pvpDraws++;
@@ -320,11 +346,13 @@ public class GameManager : MonoBehaviour
                     if (result == "Draw") stats.pveDrawsEasy++;
                     else if (playerWon) stats.pvePlayerWinsEasy++;
                     break;
+
                 case Difficulty.Medium:
                     stats.pveGamesMedium++;
                     if (result == "Draw") stats.pveDrawsMedium++;
                     else if (playerWon) stats.pvePlayerWinsMedium++;
                     break;
+
                 case Difficulty.Hard:
                     stats.pveGamesHard++;
                     if (result == "Draw") stats.pveDrawsHard++;
@@ -337,7 +365,7 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Determines if the human player won based on the result.
+    /// Determines whether the human player was the winner.
     /// </summary>
     private bool DidPlayerWin(string result)
     {
@@ -346,7 +374,7 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Triggers a delayed scene load with end-of-game message.
+    /// Triggers a scene transition with a short delay after round end.
     /// </summary>
     public void LoadSceneWithDelay(string message, float delay)
     {
@@ -354,7 +382,7 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Waits, updates stats, and opens the end game screen.
+    /// Coroutine that handles end-of-round delay, stats update, and screen change.
     /// </summary>
     private IEnumerator LoadSceneCoroutine(string message, float delay)
     {
@@ -364,7 +392,7 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Resets and reinitializes all tiles on the board.
+    /// Resets and reinitializes the board tiles for a new round.
     /// </summary>
     private void ResetBoard()
     {
@@ -374,7 +402,7 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Disables interaction with all board tiles.
+    /// Disables interaction for all board tiles.
     /// </summary>
     private void BlockAllTiles()
     {
@@ -384,7 +412,7 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Resets all round-related state flags and stops running coroutines.
+    /// Resets internal flags and cancels any active timers or coroutines.
     /// </summary>
     public void ResetAllFlags()
     {
