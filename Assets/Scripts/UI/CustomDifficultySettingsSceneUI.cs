@@ -2,31 +2,47 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
+/// <summary>
+/// Handles the UI logic for the custom difficulty settings scene,
+/// allowing players to adjust Q-learning parameters before starting the game.
+/// </summary>
 public class CustomDifficultySettingsSceneUI : MonoBehaviour
 {
+    // UI references for buttons
     public Button backButton;
     public Button playButton;
 
-    public Slider epsilonSlider;
-    public Slider alphaSlider;
-    public Slider gammaSlider;
+    // Sliders for adjusting Q-learning parameters
+    public Slider alphaSlider;   // Learning rate
+    public Slider gammaSlider;   // Discount factor (intelligence)
+    public Slider epsilonSlider; // Randomness (exploration)
 
+    /// <summary>
+    /// Initializes button listeners on scene start.
+    /// </summary>
     private void Start()
     {
         backButton.onClick.AddListener(OnBackClicked);
         playButton.onClick.AddListener(OnPlayClicked);
     }
 
-    void OnBackClicked()
+    /// <summary>
+    /// Returns the player to the difficulty selection screen.
+    /// </summary>
+    private void OnBackClicked()
     {
         SceneManager.LoadScene("DifficultySelectScene");
     }
 
-    void OnPlayClicked()
+    /// <summary>
+    /// Applies selected difficulty parameters and loads the game scene.
+    /// </summary>
+    private void OnPlayClicked()
     {
-        GameManager.Instance.CustomEpsilon = epsilonSlider.value;
-        GameManager.Instance.CustomAlpha = alphaSlider.value;
-        GameManager.Instance.CustomGamma = gammaSlider.value;
+        // Ensure values are within valid range [0, 1]
+        GameManager.Instance.CustomAlpha = Mathf.Clamp01(alphaSlider.value);
+        GameManager.Instance.CustomGamma = Mathf.Clamp01(gammaSlider.value);
+        GameManager.Instance.CustomEpsilon = Mathf.Clamp01(epsilonSlider.value);
 
         SceneManager.LoadScene("GameScene");
     }
