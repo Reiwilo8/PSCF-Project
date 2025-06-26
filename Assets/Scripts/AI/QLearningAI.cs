@@ -216,11 +216,11 @@ public class QLearningAI : MonoBehaviour
         float reward;
 
         if (result == "Draw")
-            reward = 0.5f;
+            reward = 0f;
         else if (result == aiSymbol)
             reward = 1f;
         else
-            reward = 0f;
+            reward = -1f;
 
         for (int i = episodeHistory.Count - 1; i >= 0; i--)
         {
